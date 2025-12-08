@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
-import { Prisma } from '../../../../generated'
+import { Prisma } from '@/generated/client'
 
 // Doctor Update Schema
 const DoctorUpdateSchema = z.object({
