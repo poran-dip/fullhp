@@ -254,7 +254,7 @@ export default function AppointmentsList() {
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}
-                className={cn("justify-start text-left font-normal w-[240px]", !date && "text-muted-foreground")}
+                className={cn("justify-start text-left font-normal w-60", !date && "text-muted-foreground")}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {date ? format(date, "PPP") : "Filter by date"}

@@ -45,7 +45,7 @@ export default function FeaturesPage() {
             <CardHeader>
               <CardTitle className="text-center">For Patients</CardTitle>
             </CardHeader>
-            <CardContent className="flex-grow">
+            <CardContent className="grow">
               {patientFeatures.map((feature, index) => (
                 <div key={index} className="flex items-center mb-2">
                   <Check className="mr-2 text-green-500" />
@@ -72,7 +72,7 @@ export default function FeaturesPage() {
             <CardHeader>
               <CardTitle className="text-center">For Doctors</CardTitle>
             </CardHeader>
-            <CardContent className="flex-grow">
+            <CardContent className="grow">
               {doctorFeatures.map((feature, index) => (
                 <div key={index} className="flex items-center mb-2">
                   <Check className="mr-2 text-blue-500" />
@@ -99,7 +99,7 @@ export default function FeaturesPage() {
             <CardHeader>
               <CardTitle className="text-center">For Administrators</CardTitle>
             </CardHeader>
-            <CardContent className="flex-grow">
+            <CardContent className="grow">
               {adminFeatures.map((feature, index) => (
                 <div key={index} className="flex items-center mb-2">
                   <Check className="mr-2 text-purple-500" />

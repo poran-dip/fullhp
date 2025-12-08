@@ -13,7 +13,7 @@ const Disclaimer = () => {
         <div className="flex">
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
-            className="h-5 w-5 text-amber-500 mr-2 mt-0.5 flex-shrink-0" 
+            className="h-5 w-5 text-amber-500 mr-2 mt-0.5 shrink-0" 
             viewBox="0 0 20 20" 
             fill="currentColor"
           >
@@ -32,7 +32,7 @@ const Disclaimer = () => {
         </div>
         <button 
           onClick={() => setIsVisible(false)} 
-          className="text-amber-500 hover:text-amber-700 ml-4 flex-shrink-0"
+          className="text-amber-500 hover:text-amber-700 ml-4 shrink-0"
         >
           <svg 
             xmlns="http://www.w3.org/2000/svg" 

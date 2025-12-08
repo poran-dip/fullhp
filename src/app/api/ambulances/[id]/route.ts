@@ -58,7 +58,7 @@ export async function PUT(
     const validation = AmbulanceUpdateSchema.safeParse(body)
     if (!validation.success) {
       return NextResponse.json({ 
-        error: validation.error.errors 
+        error: validation.error.issues
       }, { status: 400 })
     }
 

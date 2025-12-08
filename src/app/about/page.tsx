@@ -106,7 +106,7 @@ export default function AboutUsPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {teamMembers.map((member, index) => (
               <Card key={index} className="flex items-center p-6 group hover:bg-gray-50 transition-colors duration-300">
-                <div className="flex-shrink-0 mr-6">
+                <div className="shrink-0 mr-6">
                 <Image 
                   src={member.image} 
                   alt={member.name} 
@@ -117,7 +117,7 @@ export default function AboutUsPage() {
                   priority // optional, use for images above the fold
                 />
                 </div>
-                <div className="flex-grow">
+                <div className="grow">
                   <h3 className="text-xl font-bold mb-1">{member.name}</h3>
                   <p className="text-muted-foreground mb-1">{member.role}</p>
                   <p className="text-sm text-muted-foreground italic mb-3">{member.college}</p>

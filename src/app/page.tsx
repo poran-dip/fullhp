@@ -5,7 +5,7 @@ import MedbotPromo from "@/components/homepage/medbot-promo"
 import Navbar from "@/components/navbar"
 import Disclaimer from "@/components/homepage/disclaimer"
 import { prisma } from "@/lib/prisma"
-import { Decimal } from "@prisma/client/runtime/library"
+import { Prisma } from "@/generated"
 
 // Define the Doctor interface at the top level
 interface Doctor {
@@ -50,7 +50,7 @@ async function fetchDoctors(): Promise<{ doctors: Doctor[], error: string | null
     // Convert Decimal to number for each doctor
     const doctors: Doctor[] = doctorsData.map(doctor => ({
       ...doctor,
-      rating: doctor.rating instanceof Decimal ? doctor.rating.toDecimalPlaces(1).toNumber() : Number(doctor.rating)
+      rating: doctor.rating instanceof Prisma.Decimal ? doctor.rating.toDecimalPlaces(1).toNumber() : Number(doctor.rating)
     }));
     
     return {

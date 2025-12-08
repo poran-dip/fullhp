@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
-import { Prisma } from '@prisma/client'
+import { Prisma } from '@/generated'
 
 // Doctor Update Schema
 const DoctorUpdateSchema = z.object({
@@ -64,7 +64,7 @@ export async function PUT(
     const validation = DoctorUpdateSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json({ 
-        error: validation.error.errors 
+        error: validation.error.issues
       }, { status: 400 });
     }
 

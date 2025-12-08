@@ -112,7 +112,7 @@ export default function DoctorLoginPage() {
 
   if (existingRole) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-b from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
         <div className="w-full max-w-md">
           <Link 
             href="/" 
@@ -166,7 +166,7 @@ export default function DoctorLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-b from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-md">
         <Link 
           href="/" 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
+import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,16 +16,12 @@ import {
   DialogContent, 
   DialogDescription, 
   DialogHeader, 
-  DialogTitle, 
+  DialogTitle,
+  DialogFooter,
   DialogTrigger 
 } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { 
-  Popover as TimePopover, 
-  PopoverContent as TimePopoverContent, 
-  PopoverTrigger as TimePopoverTrigger 
-} from "@/components/ui/popover"
 import { Clock } from "lucide-react"
 
 export default function PatientAppointmentRegistrationPage() {
@@ -46,6 +43,7 @@ export default function PatientAppointmentRegistrationPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showTermsDialog, setShowTermsDialog] = useState(false)
 
   useEffect(() => {
     // Check if patient is already logged in
@@ -112,16 +110,21 @@ export default function PatientAppointmentRegistrationPage() {
     return true
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleTermsCheck = (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
-
-    // Validate form before submission
+    
+    // Validate form before showing terms
     if (!validateForm()) {
-      setIsSubmitting(false)
       return
     }
+    
+    setShowTermsDialog(true)
+  }
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
+    setError(null)
+    setShowTermsDialog(false)
 
     try {
       // Combine date and time for full datetime
@@ -222,7 +225,7 @@ export default function PatientAppointmentRegistrationPage() {
             Create your account and book an appointment in one step
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleTermsCheck}>
           <CardContent className="space-y-4">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
@@ -387,8 +390,8 @@ export default function PatientAppointmentRegistrationPage() {
               </div>
               <div>
                 <Label>Appointment Time *</Label>
-                <TimePopover>
-                  <TimePopoverTrigger asChild>
+                <Popover>
+                  <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className="w-full justify-start text-left font-normal"
@@ -401,8 +404,8 @@ export default function PatientAppointmentRegistrationPage() {
                         </span>
                       )}
                     </Button>
-                  </TimePopoverTrigger>
-                  <TimePopoverContent>
+                  </PopoverTrigger>
+                  <PopoverContent>
                     <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto">
                       {generateTimeSlots().map((time) => (
                         <Button
@@ -418,8 +421,8 @@ export default function PatientAppointmentRegistrationPage() {
                         </Button>
                       ))}
                     </div>
-                  </TimePopoverContent>
-                </TimePopover>
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
@@ -434,34 +437,52 @@ export default function PatientAppointmentRegistrationPage() {
             </div>
           </CardContent>
           <CardFooter>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Processing...' : 'Create Account & Book Appointment'}
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Terms of Service</DialogTitle>
-                  <DialogDescription>
-                    By creating an account and booking an appointment, you agree to our terms of service and privacy policy.
-                  </DialogDescription>
-                </DialogHeader>
-                {/* You can add more detailed terms here */}
-                <div className="space-y-4">
-                  <p>1. Your personal information will be kept confidential.</p>
-                  <p>2. Medical information is protected under HIPAA guidelines.</p>
-                  <p>3. You consent to sharing your information with the selected healthcare provider.</p>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Processing...' : 'Create Account & Book Appointment'}
+            </Button>
           </CardFooter>
         </form>
       </Card>
+
+      {/* Terms of Service Dialog */}
+      <Dialog open={showTermsDialog} onOpenChange={setShowTermsDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Terms of Service & Privacy Policy</DialogTitle>
+            <DialogDescription>
+              By creating an account and booking an appointment, you agree to our terms of service and privacy policy.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 text-sm max-h-[300px] overflow-y-auto py-2">
+            <p>Before proceeding, please acknowledge that:</p>
+            <ol className="list-decimal pl-5 space-y-2">
+              <li>Your submitted information will be used exclusively to process and display your appointment-related preferences.</li>
+              <li>Due to the developmental nature of EazyDoc, submitted data may be accessible to the Cosmic Titans development team and other users.</li>
+              <li>EazyDoc is not designed for secure or confidential handling of personal or sensitive medical information.</li>
+              <li>You understand that you submit information at your own risk.</li>
+            </ol>
+            <p className="pt-2">For complete details, please review our <Link href="/terms" className="text-blue-600 hover:underline">Terms of Service</Link> and <Link href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>.</p>
+          </div>
+          <DialogFooter className="flex-col sm:flex-row sm:justify-between gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowTermsDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              I Agree & Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

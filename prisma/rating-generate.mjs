@@ -1,6 +1,6 @@
 // rating-generate.mjs
 // run with node prisma/rating-generate.mjs
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated';
 
 // Initialize Prisma client
 const prisma = new PrismaClient();

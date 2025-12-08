@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const validation = PatientSchema.safeParse(body)
 
     if (!validation.success) {
-      const formattedErrors = validation.error.errors.map(err => err.message).join(', ')
+      const formattedErrors = validation.error.issues.map(err => err.message).join(', ')
       return NextResponse.json({ 
         error: `Invalid input: ${formattedErrors}` 
       }, { status: 400 })

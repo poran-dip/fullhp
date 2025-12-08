@@ -396,7 +396,7 @@ const AdminDoctors: React.FC = () => {
             placeholder="Search doctors..."
             value={searchTerm}
             onChange={handleSearch}
-            className="flex-grow"
+            className="grow"
           />
         </div>
         
