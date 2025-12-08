@@ -1,6 +1,6 @@
 {
-  "name": "eazydoc_webapp3",
-  "version": "0.1.0",
+  "name": "eazy-doc",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -63,7 +63,6 @@
     "@types/bcrypt": "^6.0.0",
     "@types/js-cookie": "^3.0.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/next-auth": "^3.15.0",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -74,16 +73,5 @@
     "tailwindcss": "^4.1.17",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/client",
-      "@prisma/engines",
-      "bcrypt",
-      "esbuild",
-      "prisma",
-      "sharp"
-    ]
-  },
-  "packageManager": "pnpm@10.24.0"
+  }
 }
