@@ -5,7 +5,7 @@ import MedbotPromo from "@/components/homepage/medbot-promo"
 import Navbar from "@/components/navbar"
 import Disclaimer from "@/components/homepage/disclaimer"
 import { prisma } from "@/lib/prisma"
-import { Prisma } from "@/generated"
+import { Prisma } from "../generated"
 
 // Define the Doctor interface at the top level
 interface Doctor {

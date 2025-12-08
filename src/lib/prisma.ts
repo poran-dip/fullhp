@@ -1,4 +1,4 @@
-import { PrismaClient } from '@/generated'
+import { PrismaClient } from '../generated'
 import { PrismaPg } from '@prisma/adapter-pg';
 
 // PrismaClient is attached to the `global` object in development to prevent
