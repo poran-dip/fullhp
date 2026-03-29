@@ -1,12 +1,5 @@
 import type { Config } from "tailwindcss"
-import { animations } from "motion/react";
-
-const defaultTheme = require("tailwindcss/defaultTheme");
-
-const colors = require("tailwindcss/colors");
-const {
-  default: flattenColorPalette,
-} = require("tailwindcss/lib/util/flattenColorPalette");
+import { default as flattenColorPalette } from "tailwindcss/lib/util/flattenColorPalette";
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
