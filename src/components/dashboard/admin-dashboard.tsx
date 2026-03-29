@@ -76,7 +76,7 @@ export default function AdminDashboardLayout({ children }: AdminDashboardLayoutP
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-[75vw] max-w-[300px]">
+          <SheetContent side="left" className="p-0 w-[75vw] max-w-75">
             <div className="flex h-full flex-col">
               <div className="p-3 sm:p-4 border-b">
                 <Link href="/" className="flex items-center gap-1 sm:gap-2 font-semibold text-sm sm:text-base">

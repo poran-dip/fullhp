@@ -411,7 +411,7 @@ export default function ProfileForm() {
                 <Textarea
                   id="allergies"
                   placeholder="List any allergies you have (medications, food, etc.)"
-                  className="min-h-[100px]"
+                  className="min-h-25"
                 />
               </div>
               <div className="space-y-2">
@@ -419,7 +419,7 @@ export default function ProfileForm() {
                 <Textarea
                   id="medicalConditions"
                   placeholder="List any chronic medical conditions"
-                  className="min-h-[100px]"
+                  className="min-h-25"
                 />
               </div>
               <div className="space-y-2">
@@ -427,7 +427,7 @@ export default function ProfileForm() {
                 <Textarea
                   id="medications"
                   placeholder="List any medications you are currently taking"
-                  className="min-h-[100px]"
+                  className="min-h-25"
                 />
               </div>
             </CardContent>

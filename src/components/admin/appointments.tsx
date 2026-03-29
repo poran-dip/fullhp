@@ -422,7 +422,7 @@ const AdminAppointments: React.FC = () => {
         
         <div className="flex space-x-2">
           <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-45">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>

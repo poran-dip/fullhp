@@ -74,7 +74,7 @@ export default function FeaturedDoctors({ doctors, isLoading, error }: FeaturedD
       <div className="container px-4 md:px-6 max-w-6xl mx-auto">
         <div className="flex flex-col items-center space-y-4 text-center mb-10">
           <h2 className="text-3xl font-bold tracking-tighter">Featured Doctors</h2>
-          <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
+          <p className="mx-auto max-w-175 text-muted-foreground md:text-lg">
             Our top-rated healthcare professionals ready to provide the care you need.
           </p>
         </div>

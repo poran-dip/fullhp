@@ -125,7 +125,7 @@ function DoctorsList() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
+      <div className="flex justify-center items-center min-h-100">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     )
@@ -154,7 +154,7 @@ function DoctorsList() {
             value={selectedSpecialization} 
             onValueChange={setSelectedSpecialization}
           >
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-50">
               <SelectValue placeholder="Specialization" />
             </SelectTrigger>
             <SelectContent>

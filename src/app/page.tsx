@@ -80,7 +80,7 @@ export default async function Home() {
           <div className="container px-4 md:px-6 max-w-6xl mx-auto">
             <div className="flex flex-col items-center space-y-4 text-center mb-12">
               <h1 className="text-3xl md:text-5xl font-bold tracking-tighter">Find The Right Doctor For You</h1>
-              <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
+              <p className="mx-auto max-w-175 text-muted-foreground md:text-lg">
                 Search thousands of specialists and get the care you deserve.
               </p>
             </div>

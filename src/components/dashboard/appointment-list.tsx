@@ -271,7 +271,7 @@ export default function AppointmentsList() {
             </Button>
           )}
         </div>
-        <div className="relative w-full sm:w-[300px]">
+        <div className="relative w-full sm:w-75">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"

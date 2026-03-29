@@ -226,7 +226,7 @@ const DocStatus = () => {
             <Button 
               variant={hasUrgentCases ? "destructive" : "outline"}
               onClick={toggleUrgentCases}
-              className="min-w-[100px]"
+              className="min-w-25"
             >
               {hasUrgentCases ? "Active" : "Inactive"}
             </Button>

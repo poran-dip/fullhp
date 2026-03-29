@@ -457,7 +457,7 @@ export default function PatientAppointmentRegistrationPage() {
               By creating an account and booking an appointment, you agree to our terms of service and privacy policy.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 text-sm max-h-[300px] overflow-y-auto py-2">
+          <div className="space-y-4 text-sm max-h-75 overflow-y-auto py-2">
             <p>Before proceeding, please acknowledge that:</p>
             <ol className="list-decimal pl-5 space-y-2">
               <li>Your submitted information will be used exclusively to process and display your appointment-related preferences.</li>

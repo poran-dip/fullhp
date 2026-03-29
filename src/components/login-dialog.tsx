@@ -231,7 +231,7 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] p-4 sm:p-6 max-w-[90vw]">
+      <DialogContent className="sm:max-w-106.25 p-4 sm:p-6 max-w-[90vw]">
         <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login" className="text-xs sm:text-sm">
