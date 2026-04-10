@@ -33,4 +33,4 @@ npm-debug.log*
 next-env.d.ts
 
 # misc
-.local/
+*.local
