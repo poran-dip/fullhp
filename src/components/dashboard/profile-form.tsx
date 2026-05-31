@@ -1,24 +1,40 @@
-"use client"
+"use client";
 
-import type React from "react"
+import { format } from "date-fns";
+import { CalendarIcon, ChevronLeft, ChevronRight, Save } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
 
-import { useState } from "react"
-import { CalendarIcon, ChevronLeft, ChevronRight, Save } from "lucide-react"
-import { format } from "date-fns"
-
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 export default function ProfileForm() {
-  const [date, setDate] = useState<Date>()
-  const [isSaving, setIsSaving] = useState(false)
+  const [date, setDate] = useState<Date>();
+  const [isSaving, setIsSaving] = useState(false);
 
   // Mock user data
   const userData = {
@@ -33,17 +49,17 @@ export default function ProfileForm() {
     emergencyContactName: "Jane Doe",
     emergencyContactPhone: "(555) 987-6543",
     emergencyContactRelationship: "Spouse",
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
+    e.preventDefault();
+    setIsSaving(true);
 
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    setIsSaving(false)
-  }
+    setIsSaving(false);
+  };
 
   // Custom calendar navigation components
   const CalendarHeader = ({
@@ -53,15 +69,20 @@ export default function ProfileForm() {
     view,
     setView,
   }: {
-    date: Date
-    decreaseMonth: () => void
-    increaseMonth: () => void
-    view: "date" | "month" | "year"
-    setView: (view: "date" | "month" | "year") => void
+    date: Date;
+    decreaseMonth: () => void;
+    increaseMonth: () => void;
+    view: "date" | "month" | "year";
+    setView: (view: "date" | "month" | "year") => void;
   }) => {
     return (
       <div className="flex items-center justify-between px-2 py-2">
-        <Button variant="outline" size="icon" className="h-7 w-7" onClick={decreaseMonth}>
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-7 w-7"
+          onClick={decreaseMonth}
+        >
           <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Previous month</span>
         </Button>
@@ -69,7 +90,10 @@ export default function ProfileForm() {
           <Button
             variant="ghost"
             onClick={() => setView("month")}
-            className={cn("text-sm font-medium", view === "month" && "bg-muted")}
+            className={cn(
+              "text-sm font-medium",
+              view === "month" && "bg-muted",
+            )}
           >
             {format(date, "MMMM")}
           </Button>
@@ -81,22 +105,27 @@ export default function ProfileForm() {
             {format(date, "yyyy")}
           </Button>
         </div>
-        <Button variant="outline" size="icon" className="h-7 w-7" onClick={increaseMonth}>
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-7 w-7"
+          onClick={increaseMonth}
+        >
           <ChevronRight className="h-4 w-4" />
           <span className="sr-only">Next month</span>
         </Button>
       </div>
-    )
-  }
+    );
+  };
 
   const MonthsView = ({
     date,
     setDate,
     setView,
   }: {
-    date: Date
-    setDate: (date: Date) => void
-    setView: (view: "date" | "month" | "year") => void
+    date: Date;
+    setDate: (date: Date) => void;
+    setView: (view: "date" | "month" | "year") => void;
   }) => {
     const months = [
       "January",
@@ -111,14 +140,14 @@ export default function ProfileForm() {
       "October",
       "November",
       "December",
-    ]
+    ];
 
     const handleMonthSelect = (monthIndex: number) => {
-      const newDate = new Date(date)
-      newDate.setMonth(monthIndex)
-      setDate(newDate)
-      setView("date")
-    }
+      const newDate = new Date(date);
+      newDate.setMonth(monthIndex);
+      setDate(newDate);
+      setView("date");
+    };
 
     return (
       <div className="p-2">
@@ -127,7 +156,11 @@ export default function ProfileForm() {
             <Button
               key={month}
               variant="outline"
-              className={cn("h-10", date.getMonth() === index && "bg-primary text-primary-foreground")}
+              className={cn(
+                "h-10",
+                date.getMonth() === index &&
+                  "bg-primary text-primary-foreground",
+              )}
               onClick={() => handleMonthSelect(index)}
             >
               {month.substring(0, 3)}
@@ -135,8 +168,8 @@ export default function ProfileForm() {
           ))}
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const YearsView = ({
     date,
@@ -145,26 +178,26 @@ export default function ProfileForm() {
     minYear = new Date().getFullYear() - 100,
     maxYear = new Date().getFullYear(),
   }: {
-    date: Date
-    setDate: (date: Date) => void
-    setView: (view: "date" | "month" | "year") => void
-    minYear?: number
-    maxYear?: number
+    date: Date;
+    setDate: (date: Date) => void;
+    setView: (view: "date" | "month" | "year") => void;
+    minYear?: number;
+    maxYear?: number;
   }) => {
-    const currentYear = date.getFullYear()
-    const startYear = Math.floor(currentYear / 12) * 12
+    const currentYear = date.getFullYear();
+    const startYear = Math.floor(currentYear / 12) * 12;
 
     const years = Array.from({ length: 12 }, (_, i) => {
-      const year = startYear + i
-      return year >= minYear && year <= maxYear ? year : null
-    }).filter(Boolean) as number[]
+      const year = startYear + i;
+      return year >= minYear && year <= maxYear ? year : null;
+    }).filter(Boolean) as number[];
 
     const handleYearSelect = (year: number) => {
-      const newDate = new Date(date)
-      newDate.setFullYear(year)
-      setDate(newDate)
-      setView("month")
-    }
+      const newDate = new Date(date);
+      newDate.setFullYear(year);
+      setDate(newDate);
+      setView("month");
+    };
 
     return (
       <div className="p-2">
@@ -174,9 +207,9 @@ export default function ProfileForm() {
             size="icon"
             className="h-7 w-7"
             onClick={() => {
-              const newDate = new Date(date)
-              newDate.setFullYear(currentYear - 12)
-              setDate(newDate)
+              const newDate = new Date(date);
+              newDate.setFullYear(currentYear - 12);
+              setDate(newDate);
             }}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -189,9 +222,9 @@ export default function ProfileForm() {
             size="icon"
             className="h-7 w-7"
             onClick={() => {
-              const newDate = new Date(date)
-              newDate.setFullYear(currentYear + 12)
-              setDate(newDate)
+              const newDate = new Date(date);
+              newDate.setFullYear(currentYear + 12);
+              setDate(newDate);
             }}
           >
             <ChevronRight className="h-4 w-4" />
@@ -202,7 +235,11 @@ export default function ProfileForm() {
             <Button
               key={year}
               variant="outline"
-              className={cn("h-10", date.getFullYear() === year && "bg-primary text-primary-foreground")}
+              className={cn(
+                "h-10",
+                date.getFullYear() === year &&
+                  "bg-primary text-primary-foreground",
+              )}
               onClick={() => handleYearSelect(year)}
             >
               {year}
@@ -210,8 +247,8 @@ export default function ProfileForm() {
           ))}
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const CustomCalendar = ({
     selected,
@@ -220,35 +257,35 @@ export default function ProfileForm() {
     minYear,
     maxYear,
   }: {
-    selected?: Date
-    onSelect: (date: Date | undefined) => void
-    disabled?: (date: Date) => boolean
-    minYear?: number
-    maxYear?: number
+    selected?: Date;
+    onSelect: (date: Date | undefined) => void;
+    disabled?: (date: Date) => boolean;
+    minYear?: number;
+    maxYear?: number;
   }) => {
-    const [view, setView] = useState<"date" | "month" | "year">("date")
-    const [viewDate, setViewDate] = useState<Date>(selected || new Date())
+    const [view, setView] = useState<"date" | "month" | "year">("date");
+    const [viewDate, setViewDate] = useState<Date>(selected || new Date());
 
     const handleDateSelect = (date: Date | undefined) => {
-      onSelect(date)
+      onSelect(date);
       if (date) {
-        setViewDate(date)
+        setViewDate(date);
       }
-    }
+    };
 
     return (
       <div className="p-1">
         <CalendarHeader
           date={viewDate}
           decreaseMonth={() => {
-            const newDate = new Date(viewDate)
-            newDate.setMonth(viewDate.getMonth() - 1)
-            setViewDate(newDate)
+            const newDate = new Date(viewDate);
+            newDate.setMonth(viewDate.getMonth() - 1);
+            setViewDate(newDate);
           }}
           increaseMonth={() => {
-            const newDate = new Date(viewDate)
-            newDate.setMonth(viewDate.getMonth() + 1)
-            setViewDate(newDate)
+            const newDate = new Date(viewDate);
+            newDate.setMonth(viewDate.getMonth() + 1);
+            setViewDate(newDate);
           }}
           view={view}
           setView={setView}
@@ -266,20 +303,30 @@ export default function ProfileForm() {
           />
         )}
 
-        {view === "month" && <MonthsView date={viewDate} setDate={setViewDate} setView={setView} />}
+        {view === "month" && (
+          <MonthsView date={viewDate} setDate={setViewDate} setView={setView} />
+        )}
 
         {view === "year" && (
-          <YearsView date={viewDate} setDate={setViewDate} setView={setView} minYear={minYear} maxYear={maxYear} />
+          <YearsView
+            date={viewDate}
+            setDate={setViewDate}
+            setView={setView}
+            minYear={minYear}
+            maxYear={maxYear}
+          />
         )}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
-        <p className="text-muted-foreground">Manage your personal information and preferences.</p>
+        <p className="text-muted-foreground">
+          Manage your personal information and preferences.
+        </p>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -287,7 +334,9 @@ export default function ProfileForm() {
           <Card>
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Update your personal details and contact information.</CardDescription>
+              <CardDescription>
+                Update your personal details and contact information.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -303,7 +352,11 @@ export default function ProfileForm() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue={userData.email} />
+                  <Input
+                    id="email"
+                    type="email"
+                    defaultValue={userData.email}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
@@ -316,7 +369,10 @@ export default function ProfileForm() {
                   <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
-                      className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !date && "text-muted-foreground",
+                      )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {date ? format(date, "PPP") : "Select your date of birth"}
@@ -368,21 +424,31 @@ export default function ProfileForm() {
           <Card>
             <CardHeader>
               <CardTitle>Emergency Contact</CardTitle>
-              <CardDescription>Add someone we can contact in case of an emergency.</CardDescription>
+              <CardDescription>
+                Add someone we can contact in case of an emergency.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="emergencyContactName">Contact Name</Label>
-                  <Input id="emergencyContactName" defaultValue={userData.emergencyContactName} />
+                  <Input
+                    id="emergencyContactName"
+                    defaultValue={userData.emergencyContactName}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="emergencyContactPhone">Contact Phone</Label>
-                  <Input id="emergencyContactPhone" defaultValue={userData.emergencyContactPhone} />
+                  <Input
+                    id="emergencyContactPhone"
+                    defaultValue={userData.emergencyContactPhone}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="emergencyContactRelationship">Relationship</Label>
+                <Label htmlFor="emergencyContactRelationship">
+                  Relationship
+                </Label>
                 <Select defaultValue={userData.emergencyContactRelationship}>
                   <SelectTrigger id="emergencyContactRelationship">
                     <SelectValue placeholder="Select relationship" />
@@ -403,7 +469,9 @@ export default function ProfileForm() {
           <Card>
             <CardHeader>
               <CardTitle>Medical Information</CardTitle>
-              <CardDescription>Add your medical history and allergies.</CardDescription>
+              <CardDescription>
+                Add your medical history and allergies.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -441,6 +509,7 @@ export default function ProfileForm() {
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <circle
                         className="opacity-25"
@@ -470,6 +539,5 @@ export default function ProfileForm() {
         </div>
       </form>
     </div>
-  )
+  );
 }
-

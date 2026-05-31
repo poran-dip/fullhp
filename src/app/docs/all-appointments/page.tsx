@@ -1,19 +1,20 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Define enums and interfaces based on schema
 enum Status {
-  NEW = 'NEW',
-  PENDING = 'PENDING',
-  COMPLETED = 'COMPLETED',
-  CANCELED = 'CANCELED'
+  NEW = "NEW",
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
+  CANCELED = "CANCELED",
 }
 
 interface Patient {
@@ -57,20 +58,22 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   const getStatusStyles = (): string => {
     switch (status) {
       case Status.NEW:
-        return 'bg-blue-100 text-blue-800';
+        return "bg-blue-100 text-blue-800";
       case Status.PENDING:
-        return 'bg-yellow-100 text-yellow-800';
+        return "bg-yellow-100 text-yellow-800";
       case Status.COMPLETED:
-        return 'bg-green-100 text-green-800';
+        return "bg-green-100 text-green-800";
       case Status.CANCELED:
-        return 'bg-red-100 text-red-800';
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   return (
-    <span className={`${getStatusStyles()} px-2 py-0.5 rounded-full text-xs font-medium`}>
+    <span
+      className={`${getStatusStyles()} px-2 py-0.5 rounded-full text-xs font-medium`}
+    >
       {status}
     </span>
   );
@@ -79,59 +82,60 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
 const AllAppointmentsPage: React.FC = () => {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [doctorId, setDoctorId] = useState<string>('');
-  const [doctorName, setDoctorName] = useState<string>('');
+  const [doctorId, setDoctorId] = useState<string>("");
+  const [doctorName, setDoctorName] = useState<string>("");
   const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isAppointmentsLoading, setIsAppointmentsLoading] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('all'); // 'all' or one of Status enum values
+  const [isAppointmentsLoading, setIsAppointmentsLoading] =
+    useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all"); // 'all' or one of Status enum values
   const [dateRange, setDateRange] = useState<DateRangeFilter>({
-    startDate: '',
-    endDate: ''
+    startDate: "",
+    endDate: "",
   });
 
-  // Check login status on component mount
-  useEffect(() => {
-    // We need to make sure we're running in the browser before accessing localStorage
-    if (typeof window !== 'undefined') {
-      checkAuth();
-    }
-  }, []);
+  const checkAuth = useCallback((): void => {
+    const storedIsLoggedIn = localStorage.getItem("isLoggedIn");
+    const storedDoctorId = localStorage.getItem("doctorId");
+    const storedDoctorName = localStorage.getItem("doctorName");
 
-  const checkAuth = (): void => {
-    const storedIsLoggedIn = localStorage.getItem('isLoggedIn');
-    const storedDoctorId = localStorage.getItem('doctorId');
-    const storedDoctorName = localStorage.getItem('doctorName');
-    
-    if (storedIsLoggedIn === 'true' && storedDoctorId) {
+    if (storedIsLoggedIn === "true" && storedDoctorId) {
       setIsLoggedIn(true);
       setDoctorId(storedDoctorId);
-      setDoctorName(storedDoctorName || '');
+      setDoctorName(storedDoctorName || "");
     } else {
       // Unlike the dashboard, we'll show an access denied message instead of redirecting
       setIsLoggedIn(false);
     }
     setIsLoading(false);
-  };
+  }, []);
+
+  // Check login status on component mount
+  useEffect(() => {
+    // We need to make sure we're running in the browser before accessing localStorage
+    if (typeof window !== "undefined") {
+      checkAuth();
+    }
+  }, [checkAuth]);
 
   // Fetch appointments when logged in and doctorId is available - only once
   useEffect(() => {
     const fetchAllAppointments = async (): Promise<void> => {
       if (!isLoggedIn || !doctorId) return;
-      
+
       try {
         setIsAppointmentsLoading(true);
-        
+
         // Fetch all appointments with patient details in a single call
         const url = `/api/doctors/${doctorId}/appointments?includePatientDetails=true`;
-        
+
         const response = await fetch(url);
-        
+
         if (!response.ok) {
           throw new Error(`Error fetching appointments: ${response.status}`);
         }
-        
+
         const data = await response.json();
         setAllAppointments(data);
       } catch (error) {
@@ -145,49 +149,53 @@ const AllAppointmentsPage: React.FC = () => {
   }, [isLoggedIn, doctorId]);
 
   // Filter appointments based on all criteria
-  const filteredAppointments = allAppointments.filter(appointment => {
-    const patientName = appointment.patient?.name?.toLowerCase() || '';
-    const condition = appointment.condition?.toLowerCase() || '';
+  const filteredAppointments = allAppointments.filter((appointment) => {
+    const patientName = appointment.patient?.name?.toLowerCase() || "";
+    const condition = appointment.condition?.toLowerCase() || "";
     const query = searchQuery.toLowerCase();
     const status = appointment.status;
-    const appointmentDate = appointment.dateTime ? new Date(appointment.dateTime) : null;
-    
+    const appointmentDate = appointment.dateTime
+      ? new Date(appointment.dateTime)
+      : null;
+
     // Apply search filter
-    const matchesSearch = patientName.includes(query) || condition.includes(query);
-    
+    const matchesSearch =
+      patientName.includes(query) || condition.includes(query);
+
     // Apply status filter
-    const matchesStatus = statusFilter === 'all' || status === statusFilter;
-    
+    const matchesStatus = statusFilter === "all" || status === statusFilter;
+
     // Apply date range filter
     let matchesDateRange = true;
     if (dateRange.startDate && dateRange.endDate && appointmentDate) {
       const startDate = new Date(dateRange.startDate);
       startDate.setHours(0, 0, 0, 0);
-      
+
       const endDate = new Date(dateRange.endDate);
       endDate.setHours(23, 59, 59, 999);
-      
-      matchesDateRange = appointmentDate >= startDate && appointmentDate <= endDate;
+
+      matchesDateRange =
+        appointmentDate >= startDate && appointmentDate <= endDate;
     }
-    
+
     return matchesSearch && matchesStatus && matchesDateRange;
   });
 
   // Handle login redirect
   const handleLoginRedirect = (): void => {
-    router.push('/docs/login');
+    router.push("/docs/login");
   };
 
   // Format date for display
   const formatDate = (dateString?: string): string => {
-    if (!dateString) return 'No date specified';
+    if (!dateString) return "No date specified";
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(date);
   };
 
@@ -209,9 +217,7 @@ const AllAppointmentsPage: React.FC = () => {
           <p className="mb-6 text-slate-600">
             You need to be logged in to view appointments.
           </p>
-          <Button onClick={handleLoginRedirect}>
-            Go to Login
-          </Button>
+          <Button onClick={handleLoginRedirect}>Go to Login</Button>
         </Card>
       </div>
     );
@@ -223,9 +229,7 @@ const AllAppointmentsPage: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold">All Appointments</h1>
-          {doctorName && (
-            <p className="text-slate-600">Dr. {doctorName}</p>
-          )}
+          {doctorName && <p className="text-slate-600">Dr. {doctorName}</p>}
         </div>
         <Link href="/docs">
           <Button variant="outline">Back to Dashboard</Button>
@@ -243,25 +247,33 @@ const AllAppointmentsPage: React.FC = () => {
               className="w-full"
             />
           </div>
-          
+
           <div className="flex gap-2">
             <Input
               type="date"
               value={dateRange.startDate}
-              onChange={(e) => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
+              onChange={(e) =>
+                setDateRange((prev) => ({ ...prev, startDate: e.target.value }))
+              }
               className="w-36"
             />
             <span className="flex items-center">to</span>
             <Input
               type="date"
               value={dateRange.endDate}
-              onChange={(e) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
+              onChange={(e) =>
+                setDateRange((prev) => ({ ...prev, endDate: e.target.value }))
+              }
               className="w-36"
             />
           </div>
-          
+
           <div>
-            <Tabs defaultValue="all" value={statusFilter} onValueChange={setStatusFilter}>
+            <Tabs
+              defaultValue="all"
+              value={statusFilter}
+              onValueChange={setStatusFilter}
+            >
               <TabsList>
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value={Status.NEW}>New</TabsTrigger>
@@ -286,24 +298,31 @@ const AllAppointmentsPage: React.FC = () => {
             </div>
           ) : filteredAppointments.length > 0 ? (
             filteredAppointments.map((appointment) => (
-              <div key={appointment.id} className="p-4 border rounded-lg hover:bg-slate-50">
+              <div
+                key={appointment.id}
+                className="p-4 border rounded-lg hover:bg-slate-50"
+              >
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-lg font-semibold flex items-center">
-                      {appointment.patient?.name || 'Unknown Patient'}
+                      {appointment.patient?.name || "Unknown Patient"}
                       <span className="ml-2">
                         <StatusBadge status={appointment.status} />
                       </span>
                     </p>
                     <p className="text-sm font-medium text-slate-700 mt-1">
-                      <span className="text-blue-600">{formatDate(appointment.dateTime)}</span> 
+                      <span className="text-blue-600">
+                        {formatDate(appointment.dateTime)}
+                      </span>
                       {appointment.condition && ` - ${appointment.condition}`}
                     </p>
-                    {appointment.patient?.age && appointment.patient?.gender && (
-                      <p className="text-sm text-slate-500 mt-1">
-                        {appointment.patient.age} years, {appointment.patient.gender}
-                      </p>
-                    )}
+                    {appointment.patient?.age &&
+                      appointment.patient?.gender && (
+                        <p className="text-sm text-slate-500 mt-1">
+                          {appointment.patient.age} years,{" "}
+                          {appointment.patient.gender}
+                        </p>
+                      )}
                   </div>
                   <Link href={`/docs/appointments/${appointment.id}`}>
                     <Button variant="outline" size="sm" className="text-xs">
@@ -315,8 +334,12 @@ const AllAppointmentsPage: React.FC = () => {
             ))
           ) : (
             <div className="p-10 text-center">
-              <p className="text-xl font-semibold text-slate-600">No appointments found</p>
-              <p className="text-slate-500 mt-2">Try adjusting your search or filters</p>
+              <p className="text-xl font-semibold text-slate-600">
+                No appointments found
+              </p>
+              <p className="text-slate-500 mt-2">
+                Try adjusting your search or filters
+              </p>
             </div>
           )}
         </div>

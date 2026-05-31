@@ -1,26 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle,  
-  DialogClose 
-} from '@/components/ui/dialog';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
+import { format } from "date-fns";
+import {
+  Calendar as CalendarIcon,
+  Loader2,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+} from "lucide-react";
+import Link from "next/link";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,10 +21,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Search, Pencil, Trash2, Plus, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
-import { format } from 'date-fns';
-import { toast } from "sonner";
-import Link from 'next/link';
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface UpdatedData {
   name: string;
@@ -61,7 +69,7 @@ interface Appointment {
   dateTime?: Date | null;
   condition?: string | null;
   specialization?: string | null;
-  status: 'NEW' | 'PENDING' | 'COMPLETED' | 'CANCELED';
+  status: "NEW" | "PENDING" | "COMPLETED" | "CANCELED";
   doctor?: {
     name: string;
     email: string;
@@ -77,7 +85,11 @@ interface AppointmentViewProps {
 }
 
 // Appointment view component
-const AppointmentView: React.FC<AppointmentViewProps> = ({ patientName, appointments, isLoading }) => {
+const AppointmentView: React.FC<AppointmentViewProps> = ({
+  patientName,
+  appointments,
+  isLoading,
+}) => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center p-8">
@@ -85,10 +97,12 @@ const AppointmentView: React.FC<AppointmentViewProps> = ({ patientName, appointm
       </div>
     );
   }
-  
+
   return (
     <div className="p-4">
-      <h3 className="text-lg font-semibold mb-4">Appointments for {patientName}</h3>
+      <h3 className="text-lg font-semibold mb-4">
+        Appointments for {patientName}
+      </h3>
       {appointments.length === 0 ? (
         <p className="text-gray-500">No appointments found for this patient.</p>
       ) : (
@@ -105,16 +119,28 @@ const AppointmentView: React.FC<AppointmentViewProps> = ({ patientName, appointm
             <TableBody>
               {appointments.map((appointment) => (
                 <TableRow key={appointment.id}>
-                  <TableCell>{appointment.dateTime ? format(new Date(appointment.dateTime), 'PPp') : 'Not scheduled'}</TableCell>
-                  <TableCell>{appointment.doctor ? appointment.doctor.name : 'Unassigned'}</TableCell>
-                  <TableCell>{appointment.condition || 'Not specified'}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium
-                      ${appointment.status === 'NEW' ? 'bg-blue-100 text-blue-800' : ''}
-                      ${appointment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : ''}
-                      ${appointment.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : ''}
-                      ${appointment.status === 'CANCELED' ? 'bg-red-100 text-red-800' : ''}
-                    `}>
+                    {appointment.dateTime
+                      ? format(new Date(appointment.dateTime), "PPp")
+                      : "Not scheduled"}
+                  </TableCell>
+                  <TableCell>
+                    {appointment.doctor
+                      ? appointment.doctor.name
+                      : "Unassigned"}
+                  </TableCell>
+                  <TableCell>
+                    {appointment.condition || "Not specified"}
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium
+                      ${appointment.status === "NEW" ? "bg-blue-100 text-blue-800" : ""}
+                      ${appointment.status === "PENDING" ? "bg-yellow-100 text-yellow-800" : ""}
+                      ${appointment.status === "COMPLETED" ? "bg-green-100 text-green-800" : ""}
+                      ${appointment.status === "CANCELED" ? "bg-red-100 text-red-800" : ""}
+                    `}
+                    >
                       {appointment.status}
                     </span>
                   </TableCell>
@@ -131,63 +157,66 @@ const AppointmentView: React.FC<AppointmentViewProps> = ({ patientName, appointm
 const AdminPatients: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Patient form state
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
   const [currentPatient, setCurrentPatient] = useState<Patient | null>(null);
-  const [patientAppointments, setPatientAppointments] = useState<Appointment[]>([]);
+  const [patientAppointments, setPatientAppointments] = useState<Appointment[]>(
+    [],
+  );
   const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
-  
+
   // Form fields
-  const [formName, setFormName] = useState('');
-  const [formEmail, setFormEmail] = useState('');
-  const [formPassword, setFormPassword] = useState('');
-  const [formGender, setFormGender] = useState('');
-  const [formAge, setFormAge] = useState('');
-  
-  // Fetch all patients on component mount
-  useEffect(() => {
-    fetchPatients();
-  }, []);
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formPassword, setFormPassword] = useState("");
+  const [formGender, setFormGender] = useState("");
+  const [formAge, setFormAge] = useState("");
 
   // Fetch all patients from API
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/patients', { method: 'GET' });
+      const response = await fetch("/api/patients", { method: "GET" });
       if (!response.ok) {
-        throw new Error('Failed to fetch patients');
+        throw new Error("Failed to fetch patients");
       }
       const data = await response.json();
       setPatients(data);
       setFilteredPatients(data);
     } catch (error) {
-      console.error('Error fetching patients:', error);
+      console.error("Error fetching patients:", error);
       toast.error("Error", {
         description: "Failed to load patient data",
       });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // Fetch all patients on component mount
+  useEffect(() => {
+    fetchPatients();
+  }, [fetchPatients]);
 
   // Search functionality
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    
-    if (term.trim() === '') {
+
+    if (term.trim() === "") {
       setFilteredPatients(patients);
     } else {
-      const filtered = patients.filter(patient => 
-        patient.name.toLowerCase().includes(term) || 
-        patient.email.toLowerCase().includes(term)
+      const filtered = patients.filter(
+        (patient) =>
+          patient.name.toLowerCase().includes(term) ||
+          patient.email.toLowerCase().includes(term),
       );
       setFilteredPatients(filtered);
     }
@@ -196,11 +225,11 @@ const AdminPatients: React.FC = () => {
   // Add patient
   const handleAddPatient = () => {
     // Reset form
-    setFormName('');
-    setFormEmail('');
-    setFormPassword('');
-    setFormGender('');
-    setFormAge('');
+    setFormName("");
+    setFormEmail("");
+    setFormPassword("");
+    setFormGender("");
+    setFormAge("");
     setIsAddDialogOpen(true);
   };
 
@@ -214,39 +243,39 @@ const AdminPatients: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      const response = await fetch('/api/patients', {
-        method: 'POST',
+      const response = await fetch("/api/patients", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: formName,
           email: formEmail,
           password: formPassword,
           gender: formGender || null,
-          age: formAge ? parseInt(formAge) : null,
+          age: formAge ? parseInt(formAge, 10) : null,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create patient');
+        throw new Error("Failed to create patient");
       }
 
       const newPatient = await response.json();
-      
+
       // Update local state
-      setPatients(prev => [...prev, newPatient]);
-      setFilteredPatients(prev => [...prev, newPatient]);
-      
+      setPatients((prev) => [...prev, newPatient]);
+      setFilteredPatients((prev) => [...prev, newPatient]);
+
       toast.success("Success", {
         description: "Patient created successfully",
       });
-      
+
       setIsAddDialogOpen(false);
     } catch (error) {
-      console.error('Error creating patient:', error);
+      console.error("Error creating patient:", error);
       toast.error("Error", {
         description: "Failed to create patient",
       });
@@ -260,9 +289,9 @@ const AdminPatients: React.FC = () => {
     setCurrentPatient(patient);
     setFormName(patient.name);
     setFormEmail(patient.email);
-    setFormPassword(''); // Don't populate password for security
-    setFormGender(patient.gender || '');
-    setFormAge(patient.age?.toString() || '');
+    setFormPassword(""); // Don't populate password for security
+    setFormGender(patient.gender || "");
+    setFormAge(patient.age?.toString() || "");
     setIsEditDialogOpen(true);
   };
 
@@ -276,49 +305,49 @@ const AdminPatients: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const updatedData: UpdatedData = {
         name: formName,
         email: formEmail,
         gender: formGender || null,
-        age: formAge ? parseInt(formAge) : null,
+        age: formAge ? parseInt(formAge, 10) : null,
       };
-      
+
       // Only include password if it was changed
       if (formPassword) {
         updatedData.password = formPassword;
       }
-      
+
       const response = await fetch(`/api/patients/${currentPatient.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(updatedData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update patient');
+        throw new Error("Failed to update patient");
       }
 
       const updatedPatient = await response.json();
-      
+
       // Update local state
-      setPatients(prev => prev.map(p => 
-        p.id === currentPatient.id ? updatedPatient : p
-      ));
-      setFilteredPatients(prev => prev.map(p => 
-        p.id === currentPatient.id ? updatedPatient : p
-      ));
-      
+      setPatients((prev) =>
+        prev.map((p) => (p.id === currentPatient.id ? updatedPatient : p)),
+      );
+      setFilteredPatients((prev) =>
+        prev.map((p) => (p.id === currentPatient.id ? updatedPatient : p)),
+      );
+
       toast.success("Success", {
         description: "Patient updated successfully",
       });
-      
+
       setIsEditDialogOpen(false);
     } catch (error) {
-      console.error('Error updating patient:', error);
+      console.error("Error updating patient:", error);
       toast.error("Error", {
         description: "Failed to update patient",
       });
@@ -335,29 +364,31 @@ const AdminPatients: React.FC = () => {
 
   const confirmDelete = async () => {
     if (!currentPatient) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const response = await fetch(`/api/patients/${currentPatient.id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete patient');
+        throw new Error("Failed to delete patient");
       }
-      
+
       // Update local state
-      setPatients(prev => prev.filter(p => p.id !== currentPatient.id));
-      setFilteredPatients(prev => prev.filter(p => p.id !== currentPatient.id));
-      
+      setPatients((prev) => prev.filter((p) => p.id !== currentPatient.id));
+      setFilteredPatients((prev) =>
+        prev.filter((p) => p.id !== currentPatient.id),
+      );
+
       toast.success("Success", {
         description: "Patient deleted successfully",
       });
-      
+
       setIsDeleteDialogOpen(false);
     } catch (error) {
-      console.error('Error deleting patient:', error);
+      console.error("Error deleting patient:", error);
       toast.error("Error", {
         description: "Failed to delete patient",
       });
@@ -370,18 +401,18 @@ const AdminPatients: React.FC = () => {
   const handleViewAppointments = async (patient: Patient) => {
     setCurrentPatient(patient);
     setIsAppointmentDialogOpen(true);
-    
+
     // Fetch appointments for this patient
     setIsLoadingAppointments(true);
     try {
       const response = await fetch(`/api/appointments?patientId=${patient.id}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch appointments');
+        throw new Error("Failed to fetch appointments");
       }
       const data = await response.json();
       setPatientAppointments(data);
     } catch (error) {
-      console.error('Error fetching appointments:', error);
+      console.error("Error fetching appointments:", error);
       toast.error("Error", {
         description: "Failed to load appointment data",
       });
@@ -404,8 +435,11 @@ const AdminPatients: React.FC = () => {
             className="grow"
           />
         </div>
-        
-        <Button onClick={handleAddPatient} className="flex items-center bg-green-600 hover:bg-green-700">
+
+        <Button
+          onClick={handleAddPatient}
+          className="flex items-center bg-green-600 hover:bg-green-700"
+        >
           <Plus className="mr-2 h-4 w-4" /> Add New Patient
         </Button>
 
@@ -440,7 +474,10 @@ const AdminPatients: React.FC = () => {
               </TableRow>
             ) : filteredPatients.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                <TableCell
+                  colSpan={5}
+                  className="text-center py-6 text-gray-500"
+                >
                   No patients found
                 </TableCell>
               </TableRow>
@@ -449,8 +486,8 @@ const AdminPatients: React.FC = () => {
                 <TableRow key={patient.id}>
                   <TableCell className="font-medium">{patient.name}</TableCell>
                   <TableCell>{patient.email}</TableCell>
-                  <TableCell>{patient.age || '-'}</TableCell>
-                  <TableCell>{patient.gender || '-'}</TableCell>
+                  <TableCell>{patient.age || "-"}</TableCell>
+                  <TableCell>{patient.gender || "-"}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button
@@ -493,7 +530,7 @@ const AdminPatients: React.FC = () => {
               Enter the patient details below
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
@@ -506,7 +543,7 @@ const AdminPatients: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">
                 Email *
@@ -519,7 +556,7 @@ const AdminPatients: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="password" className="text-right">
                 Password *
@@ -532,11 +569,11 @@ const AdminPatients: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Gender</Label>
-              <RadioGroup 
-                value={formGender} 
+              <RadioGroup
+                value={formGender}
                 onValueChange={setFormGender}
                 className="col-span-3 flex gap-4"
               >
@@ -554,7 +591,7 @@ const AdminPatients: React.FC = () => {
                 </div>
               </RadioGroup>
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="age" className="text-right">
                 Age
@@ -570,22 +607,28 @@ const AdminPatients: React.FC = () => {
               />
             </div>
           </div>
-          
+
           <DialogFooter className="sm:justify-end">
             <DialogClose asChild>
-              <Button variant="secondary" disabled={isSubmitting}>Cancel</Button>
+              <Button variant="secondary" disabled={isSubmitting}>
+                Cancel
+              </Button>
             </DialogClose>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={submitNewPatient}
-              disabled={isSubmitting || !formName || !formEmail || !formPassword}
+              disabled={
+                isSubmitting || !formName || !formEmail || !formPassword
+              }
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Adding...
                 </>
-              ) : 'Add Patient'}
+              ) : (
+                "Add Patient"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -600,7 +643,7 @@ const AdminPatients: React.FC = () => {
               Update the patient details below
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-name" className="text-right">
@@ -613,7 +656,7 @@ const AdminPatients: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-email" className="text-right">
                 Email *
@@ -626,7 +669,7 @@ const AdminPatients: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-password" className="text-right">
                 Password
@@ -640,11 +683,11 @@ const AdminPatients: React.FC = () => {
                 placeholder="Leave blank to keep current password"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Gender</Label>
-              <RadioGroup 
-                value={formGender} 
+              <RadioGroup
+                value={formGender}
                 onValueChange={setFormGender}
                 className="col-span-3 flex gap-4"
               >
@@ -662,7 +705,7 @@ const AdminPatients: React.FC = () => {
                 </div>
               </RadioGroup>
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-age" className="text-right">
                 Age
@@ -678,13 +721,15 @@ const AdminPatients: React.FC = () => {
               />
             </div>
           </div>
-          
+
           <DialogFooter className="sm:justify-end">
             <DialogClose asChild>
-              <Button variant="secondary" disabled={isSubmitting}>Cancel</Button>
+              <Button variant="secondary" disabled={isSubmitting}>
+                Cancel
+              </Button>
             </DialogClose>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={submitEditedPatient}
               disabled={isSubmitting || !formName || !formEmail}
             >
@@ -693,26 +738,33 @@ const AdminPatients: React.FC = () => {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
-              ) : 'Save Changes'}
+              ) : (
+                "Save Changes"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete {currentPatient?.name}&apos;s record and all associated data.
-              This action cannot be undone.
+              This will permanently delete {currentPatient?.name}&apos;s record
+              and all associated data. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDelete} 
+            <AlertDialogCancel disabled={isSubmitting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
               className="bg-red-500 hover:bg-red-600"
               disabled={isSubmitting}
             >
@@ -721,14 +773,19 @@ const AdminPatients: React.FC = () => {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Deleting...
                 </>
-              ) : 'Delete'}
+              ) : (
+                "Delete"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* View Appointments Dialog */}
-      <Dialog open={isAppointmentDialogOpen} onOpenChange={setIsAppointmentDialogOpen}>
+      <Dialog
+        open={isAppointmentDialogOpen}
+        onOpenChange={setIsAppointmentDialogOpen}
+      >
         <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-auto">
           <DialogHeader>
             <DialogTitle>Patient Appointments</DialogTitle>
@@ -736,10 +793,10 @@ const AdminPatients: React.FC = () => {
               Viewing all appointments for {currentPatient?.name}
             </DialogDescription>
           </DialogHeader>
-          
+
           {currentPatient && (
             <div className="py-2">
-              <AppointmentView 
+              <AppointmentView
                 patientId={currentPatient.id}
                 patientName={currentPatient.name}
                 appointments={patientAppointments}
@@ -747,7 +804,7 @@ const AdminPatients: React.FC = () => {
               />
             </div>
           )}
-          
+
           <DialogFooter className="pt-2">
             <DialogClose asChild>
               <Button>Close</Button>

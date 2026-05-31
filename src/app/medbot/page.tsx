@@ -1,54 +1,66 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { Bot, Send, ArrowLeft, Loader2, ThumbsUp, ThumbsDown, User, AlertCircle } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  AlertCircle,
+  ArrowLeft,
+  Bot,
+  Loader2,
+  Send,
+  ThumbsDown,
+  ThumbsUp,
+  User,
+} from "lucide-react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 type Message = {
-  id: string
-  content: string
-  sender: "user" | "bot"
-  timestamp: Date
-  isLoading?: boolean
+  id: string;
+  content: string;
+  sender: "user" | "bot";
+  timestamp: Date;
+  isLoading?: boolean;
   structuredResponse?: {
-    response: string
+    response: string;
     analysis: {
-      symptomAnalysis: string
-      specialistType: string
-      urgencyLevel: string
-    }
-    context: string
-  }
-}
+      symptomAnalysis: string;
+      specialistType: string;
+      urgencyLevel: string;
+    };
+    context: string;
+  };
+};
 
 type QuickReply = {
-  id: string
-  text: string
-}
+  id: string;
+  text: string;
+};
 
 export default function MedbotPage() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState("")
-  const [conversationContext, setConversationContext] = useState("Initial conversation")
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [conversationContext, setConversationContext] = useState(
+    "Initial conversation",
+  );
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize chat with welcome message
   useEffect(() => {
     setMessages([
       {
         id: "welcome",
-        content: "Hi! I'm MedBot, your medical assistant. I'm here to help understand your symptoms and recommend appropriate medical specialists. What health concerns can I help you with today?",
+        content:
+          "Hi! I'm MedBot, your medical assistant. I'm here to help understand your symptoms and recommend appropriate medical specialists. What health concerns can I help you with today?",
         sender: "bot",
         timestamp: new Date(),
       },
-    ])
-  }, [])
+    ]);
+  }, []);
 
   const quickReplies: QuickReply[] = [
     { id: "q1", text: "I have a headache" },
@@ -56,26 +68,26 @@ export default function MedbotPage() {
     { id: "q3", text: "Skin rash" },
     { id: "q4", text: "Joint pain" },
     { id: "q5", text: "Feeling anxious" },
-  ]
+  ];
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   const handleSend = async () => {
-    if (input.trim() === "") return
+    if (input.trim() === "") return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       content: input,
       sender: "user",
       timestamp: new Date(),
-    }
+    };
 
-    setMessages((prev) => [...prev, userMessage])
-    setInput("")
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
 
-    const loadingId = (Date.now() + 1).toString()
+    const loadingId = (Date.now() + 1).toString();
     setMessages((prev) => [
       ...prev,
       {
@@ -85,7 +97,7 @@ export default function MedbotPage() {
         timestamp: new Date(),
         isLoading: true,
       },
-    ])
+    ]);
 
     try {
       const response = await fetch("/api/medbot", {
@@ -97,14 +109,14 @@ export default function MedbotPage() {
           message: input,
           conversationContext: conversationContext,
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to get response")
+        throw new Error("Failed to get response");
       }
 
-      const data = await response.json()
-      setConversationContext(data.response.context || conversationContext)
+      const data = await response.json();
+      setConversationContext(data.response.context || conversationContext);
 
       setMessages((prev) =>
         prev
@@ -114,35 +126,36 @@ export default function MedbotPage() {
             content: data.response.response,
             sender: "bot",
             timestamp: new Date(),
-            structuredResponse: data.response
-          })
-      )
+            structuredResponse: data.response,
+          }),
+      );
     } catch (error) {
-      console.error("Chat error:", error)
+      console.error("Chat error:", error);
       setMessages((prev) =>
         prev
           .filter((msg) => msg.id !== loadingId)
           .concat({
             id: (Date.now() + 2).toString(),
-            content: "I apologize, but I'm having trouble processing your request. Please try again.",
+            content:
+              "I apologize, but I'm having trouble processing your request. Please try again.",
             sender: "bot",
             timestamp: new Date(),
-          })
-      )
+          }),
+      );
     }
-  }
+  };
 
   const handleQuickReply = async (text: string) => {
-    setInput(text)
-    await handleSend()
-  }
+    setInput(text);
+    await handleSend();
+  };
 
   const handleKeyDown = async (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      await handleSend()
+      e.preventDefault();
+      await handleSend();
     }
-  }
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
@@ -167,7 +180,9 @@ export default function MedbotPage() {
               </Avatar>
               <div>
                 <p className="text-sm font-medium">MedBot Assistant</p>
-                <p className="text-xs text-muted-foreground">AI Healthcare Guide</p>
+                <p className="text-xs text-muted-foreground">
+                  AI Healthcare Guide
+                </p>
               </div>
             </div>
           </div>
@@ -190,8 +205,12 @@ export default function MedbotPage() {
                 </Avatar>
               )}
 
-              <div className={`max-w-[80%] ${message.sender === "user" ? "order-1" : "order-2"}`}>
-                <Card className={`${message.sender === "user" ? "bg-primary text-primary-foreground" : "bg-white"}`}>
+              <div
+                className={`max-w-[80%] ${message.sender === "user" ? "order-1" : "order-2"}`}
+              >
+                <Card
+                  className={`${message.sender === "user" ? "bg-primary text-primary-foreground" : "bg-white"}`}
+                >
                   <CardContent className="p-4">
                     {message.isLoading ? (
                       <div className="flex items-center justify-center py-2">
@@ -199,34 +218,51 @@ export default function MedbotPage() {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        <p className="text-sm md:text-base">{message.content}</p>
-                        
+                        <p className="text-sm md:text-base">
+                          {message.content}
+                        </p>
+
                         {/* Show recommendations only when specialist type is available */}
-                        {message.structuredResponse?.analysis?.specialistType && (
+                        {message.structuredResponse?.analysis
+                          ?.specialistType && (
                           <div className="mt-4 space-y-4 border-t pt-4">
                             <div className="bg-blue-50 rounded-lg p-4 space-y-3">
                               <div className="space-y-1">
-                                <p className="text-sm font-medium text-blue-800">Medical Assessment</p>
+                                <p className="text-sm font-medium text-blue-800">
+                                  Medical Assessment
+                                </p>
                                 <p className="text-sm text-blue-700">
-                                  {message.structuredResponse.analysis.symptomAnalysis}
+                                  {
+                                    message.structuredResponse.analysis
+                                      .symptomAnalysis
+                                  }
                                 </p>
                               </div>
-                              
+
                               <div className="space-y-1">
-                                <p className="text-sm font-medium text-blue-800">Recommended Specialist</p>
+                                <p className="text-sm font-medium text-blue-800">
+                                  Recommended Specialist
+                                </p>
                                 <p className="text-sm text-blue-700">
-                                  {message.structuredResponse.analysis.specialistType}
+                                  {
+                                    message.structuredResponse.analysis
+                                      .specialistType
+                                  }
                                 </p>
                               </div>
-                              
-                              {message.structuredResponse.analysis.urgencyLevel && (
-                                <Alert 
-                                  variant="destructive" 
+
+                              {message.structuredResponse.analysis
+                                .urgencyLevel && (
+                                <Alert
+                                  variant="destructive"
                                   className="mt-2 bg-red-50 border-red-200"
                                 >
                                   <AlertCircle className="h-4 w-4 text-red-600" />
                                   <AlertDescription className="text-red-600">
-                                    {message.structuredResponse.analysis.urgencyLevel}
+                                    {
+                                      message.structuredResponse.analysis
+                                        .urgencyLevel
+                                    }
                                   </AlertDescription>
                                 </Alert>
                               )}
@@ -236,10 +272,18 @@ export default function MedbotPage() {
 
                         {message.sender === "bot" && (
                           <div className="flex items-center justify-end gap-2 mt-2">
-                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                            >
                               <ThumbsUp className="h-3 w-3" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                            >
                               <ThumbsDown className="h-3 w-3" />
                             </Button>
                           </div>
@@ -249,13 +293,19 @@ export default function MedbotPage() {
                   </CardContent>
                 </Card>
                 <p className="text-xs text-muted-foreground mt-1 px-1">
-                  {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  {message.timestamp.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </p>
               </div>
 
               {message.sender === "user" && (
                 <Avatar className="h-8 w-8 ml-2 mt-1">
-                  <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+                  <AvatarImage
+                    src="/placeholder.svg?height=32&width=32"
+                    alt="User"
+                  />
                   <AvatarFallback>
                     <User className="h-4 w-4" />
                   </AvatarFallback>
@@ -270,7 +320,9 @@ export default function MedbotPage() {
       {messages.length < 3 && (
         <div className="bg-white border-t p-3">
           <div className="container max-w-4xl mx-auto">
-            <p className="text-sm text-muted-foreground mb-2">Suggested questions:</p>
+            <p className="text-sm text-muted-foreground mb-2">
+              Suggested questions:
+            </p>
             <div className="flex flex-wrap gap-2">
               {quickReplies.map((reply) => (
                 <Button
@@ -308,10 +360,11 @@ export default function MedbotPage() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            MedBot provides general guidance only. Always consult with a healthcare professional for medical advice.
+            MedBot provides general guidance only. Always consult with a
+            healthcare professional for medical advice.
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

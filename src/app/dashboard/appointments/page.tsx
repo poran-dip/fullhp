@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import PatientDashboardLayout from "@/components/dashboard/patient-dashboard"
-import AppointmentsList from "@/components/dashboard/appointment-list"
+import AppointmentsList from "@/components/dashboard/appointment-list";
+import PatientDashboardLayout from "@/components/dashboard/patient-dashboard";
 
 function AppointmentsPage() {
   return (
     <PatientDashboardLayout>
       <AppointmentsList />
     </PatientDashboardLayout>
-  )
+  );
 }
 
-export default AppointmentsPage
+export default AppointmentsPage;

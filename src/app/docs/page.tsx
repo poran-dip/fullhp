@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import DoctorDashboardLayout from "@/components/dashboard/doctor-dashboard"
-import DocHome from "@/components/doc/home"
+import DoctorDashboardLayout from "@/components/dashboard/doctor-dashboard";
+import DocHome from "@/components/doc/home";
 
 function DoctorHomepage() {
   const router = useRouter();
@@ -27,7 +27,7 @@ function DoctorHomepage() {
     <DoctorDashboardLayout>
       <DocHome doctorId={doctorId} />
     </DoctorDashboardLayout>
-  )
+  );
 }
 
-export default DoctorHomepage
+export default DoctorHomepage;

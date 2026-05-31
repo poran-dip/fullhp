@@ -1,14 +1,25 @@
 // components/ProfileImageUploader.tsx
-import React, { useState, useCallback } from 'react';
-import Cropper, { Area } from 'react-easy-crop';
-import { createClient } from '@supabase/supabase-js';
 
-import { Dialog, DialogContent, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { createClient } from "@supabase/supabase-js";
+import NextImage from "next/image";
+import type React from "react";
+import { useCallback, useState } from "react";
+import Cropper, { type Area } from "react-easy-crop";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Define your Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error("Missing supabase credentials");
+}
 
 interface ProfileImageUploaderProps {
   currentImageUrl?: string;
@@ -19,22 +30,22 @@ interface ProfileImageUploaderProps {
 const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const image = new Image();
-    image.addEventListener('load', () => resolve(image));
-    image.addEventListener('error', (error) => reject(error));
+    image.addEventListener("load", () => resolve(image));
+    image.addEventListener("error", (error) => reject(error));
     image.src = url;
   });
 
 // Function to get cropped image as a blob
 async function getCroppedImg(
   imageSrc: string,
-  pixelCrop: { x: number; y: number; width: number; height: number }
+  pixelCrop: { x: number; y: number; width: number; height: number },
 ): Promise<Blob> {
   const image = await createImage(imageSrc);
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
 
   if (!ctx) {
-    throw new Error('No 2d context');
+    throw new Error("No 2d context");
   }
 
   // Set canvas size to the crop size
@@ -51,24 +62,30 @@ async function getCroppedImg(
     0,
     0,
     pixelCrop.width,
-    pixelCrop.height
+    pixelCrop.height,
   );
 
   // Get the data as a blob
   return new Promise((resolve) => {
-    canvas.toBlob((blob) => {
-      if (!blob) throw new Error('Canvas is empty');
-      resolve(blob);
-    }, 'image/jpeg', 0.95);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) throw new Error("Canvas is empty");
+        resolve(blob);
+      },
+      "image/jpeg",
+      0.95,
+    );
   });
 }
 
 const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
   currentImageUrl,
-  onImageUploaded
+  onImageUploaded,
 }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    currentImageUrl || null,
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -95,7 +112,7 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
     setIsCropping(true);
-    
+
     // Reset crop and zoom
     setCrop({ x: 0, y: 0 });
     setZoom(1);
@@ -108,46 +125,46 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
   // Upload the cropped image
   const uploadCroppedImage = async () => {
     if (!selectedFile || !croppedAreaPixels || !previewUrl) return;
-    
+
     setIsLoading(true);
-    
+
     try {
       // Generate the cropped image
       const croppedBlob = await getCroppedImg(previewUrl, croppedAreaPixels);
-      
+
       // Create a new File from the blob
       const croppedFile = new File(
-        [croppedBlob], 
+        [croppedBlob],
         `cropped-${selectedFile.name}`,
-        { type: 'image/jpeg' }
+        { type: "image/jpeg" },
       );
-      
+
       // Upload to Supabase Storage
       const filePath = `${Date.now()}.jpg`;
       const { error } = await supabase.storage
-        .from('avatars')
+        .from("avatars")
         .upload(filePath, croppedFile, {
-          cacheControl: '3600',
-          upsert: true
+          cacheControl: "3600",
+          upsert: true,
         });
-      
+
       if (error) {
         throw error;
       }
 
       // Get public URL
       const { data: publicUrlData } = supabase.storage
-        .from('avatars')
+        .from("avatars")
         .getPublicUrl(filePath);
-      
+
       // Call the callback with the new image URL
       onImageUploaded(publicUrlData.publicUrl);
-      
+
       // Update preview and exit cropping mode
       setPreviewUrl(publicUrlData.publicUrl);
       setIsCropping(false);
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
     } finally {
       setIsLoading(false);
     }
@@ -168,9 +185,11 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
       <div className="flex items-center gap-2">
         {previewUrl && !isCropping && (
           <div className="rounded-full overflow-hidden w-16 h-16">
-            <img 
-              src={previewUrl} 
-              alt="Current profile" 
+            <NextImage
+              src={previewUrl}
+              alt="Current profile"
+              height={64}
+              width={64}
               className="w-full h-full object-cover"
             />
           </div>
@@ -189,14 +208,17 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
       </div>
 
       {isCropping && previewUrl && (
-        <Dialog open={isCropping} onOpenChange={(open) => {
-          if (!open) cancelCropping();
-        }}>
+        <Dialog
+          open={isCropping}
+          onOpenChange={(open) => {
+            if (!open) cancelCropping();
+          }}
+        >
           <DialogContent className="sm:max-w-md">
             <DialogTitle>Crop Your Image</DialogTitle>
-            <div 
+            <div
               className="relative w-full rounded-lg overflow-hidden"
-              style={{ height: '300px' }}
+              style={{ height: "300px" }}
             >
               <Cropper
                 image={previewUrl}
@@ -210,9 +232,12 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
                 showGrid={false}
               />
             </div>
-            
+
             <div className="mt-4">
-              <label htmlFor="zoom" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="zoom"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Zoom: {zoom.toFixed(1)}x
               </label>
               <input
@@ -226,9 +251,10 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
                 className="w-full"
               />
             </div>
-            
+
             <DialogFooter>
               <button
+                type="button"
                 onClick={cancelCropping}
                 disabled={isLoading}
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 disabled:bg-gray-100"
@@ -236,11 +262,12 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={uploadCroppedImage}
                 disabled={isLoading}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
               >
-                {isLoading ? 'Uploading...' : 'Save'}
+                {isLoading ? "Uploading..." : "Save"}
               </button>
             </DialogFooter>
           </DialogContent>

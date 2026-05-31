@@ -1,6 +1,6 @@
-import { Bot, MessageSquare, Check } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Bot, Check, MessageSquare } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function MedbotPromo() {
   return (
@@ -13,8 +13,9 @@ export default function MedbotPromo() {
               <h2 className="text-xl font-bold">MedBot Assistant</h2>
             </div>
             <p className="text-base mb-6 max-w-xl">
-              Not sure which specialist you need? Chat with MedBot to get personalized doctor recommendations based on
-              your symptoms and health concerns.
+              Not sure which specialist you need? Chat with MedBot to get
+              personalized doctor recommendations based on your symptoms and
+              health concerns.
             </p>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
@@ -42,21 +43,26 @@ export default function MedbotPromo() {
           <div className="bg-blue-50 p-6 md:p-10 md:w-1/2 flex items-center justify-center">
             <div className="max-w-xs w-full">
               <div className="rounded-lg bg-white p-4 mb-4 shadow-sm">
-                <p className="text-sm text-gray-700">I&apos;ve been having headaches and dizziness for the past week.</p>
+                <p className="text-sm text-gray-700">
+                  I&apos;ve been having headaches and dizziness for the past
+                  week.
+                </p>
               </div>
               <div className="rounded-lg bg-black text-white p-4 mb-4 shadow-sm">
                 <p className="text-sm">
-                  Based on your symptoms, I recommend consulting with a neurologist. Would you like me to find
-                  specialists near you?
+                  Based on your symptoms, I recommend consulting with a
+                  neurologist. Would you like me to find specialists near you?
                 </p>
               </div>
               <div className="rounded-lg bg-white p-4 shadow-sm">
-                <p className="text-sm text-gray-700">Yes, please show me available neurologists.</p>
+                <p className="text-sm text-gray-700">
+                  Yes, please show me available neurologists.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

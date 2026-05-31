@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { z } from 'zod'
-import bcrypt from 'bcryptjs'
+import bcrypt from "bcryptjs";
+import { type NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 
 // Doctor Validation Schema
 const DoctorSchema = z.object({
@@ -11,52 +11,62 @@ const DoctorSchema = z.object({
   image: z.string().optional(),
   location: z.string().optional(),
   specialization: z.string(),
-  status: z.enum(['AVAILABLE', 'ON_DUTY', 'OFF_DUTY', 'UNAVAILABLE']).optional().default('AVAILABLE')
-})
+  status: z
+    .enum(["AVAILABLE", "ON_DUTY", "OFF_DUTY", "UNAVAILABLE"])
+    .optional()
+    .default("AVAILABLE"),
+});
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const validation = DoctorSchema.safeParse(body)
+    const body = await req.json();
+    const validation = DoctorSchema.safeParse(body);
 
     if (!validation.success) {
-      return NextResponse.json({ 
-        error: validation.error.issues
-      }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: validation.error.issues,
+        },
+        { status: 400 },
+      );
     }
 
-    const hashedPassword = await bcrypt.hash(body.password, 10)
+    const hashedPassword = await bcrypt.hash(body.password, 10);
 
     const doctor = await prisma.doctor.create({
       data: {
         ...validation.data,
-        password: hashedPassword
-      }
-    })
+        password: hashedPassword,
+      },
+    });
 
     // Exclude sensitive information
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _password, ...doctorResponse } = doctor
+    const { password: _password, ...doctorResponse } = doctor;
 
-    return NextResponse.json(doctorResponse, { status: 201 })
+    return NextResponse.json(doctorResponse, { status: 201 });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'an unknown error occurred'
-    return NextResponse.json({ 
-      error: errorMessage 
-    }, { status: 500 })
+    const errorMessage =
+      error instanceof Error ? error.message : "an unknown error occurred";
+    return NextResponse.json(
+      {
+        error: errorMessage,
+      },
+      { status: 500 },
+    );
   }
 }
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url)
-    const specialization = searchParams.get('specialization')
-    const location = searchParams.get('location')
+    const { searchParams } = new URL(req.url);
+    const specialization = searchParams.get("specialization");
+    const location = searchParams.get("location");
 
     const doctors = await prisma.doctor.findMany({
       where: {
         ...(specialization ? { specialization } : {}),
-        ...(location ? { location } : {})
+        ...(location ? { location } : {}),
       },
       select: {
         id: true,
@@ -70,16 +80,20 @@ export async function GET(req: NextRequest) {
         appointments: {
           select: {
             id: true,
-            status: true
-          }
-        }
-      }
-    })
-    return NextResponse.json(doctors)
+            status: true,
+          },
+        },
+      },
+    });
+    return NextResponse.json(doctors);
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'an unknown error occurred'
-    return NextResponse.json({ 
-      error: errorMessage 
-    }, { status: 500 })
+    const errorMessage =
+      error instanceof Error ? error.message : "an unknown error occurred";
+    return NextResponse.json(
+      {
+        error: errorMessage,
+      },
+      { status: 500 },
+    );
   }
 }

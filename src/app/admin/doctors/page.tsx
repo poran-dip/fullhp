@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import AdminDashboardLayout from "@/components/dashboard/admin-dashboard"
-import AdminDoctors from "@/components/admin/doctors"
+import AdminDoctors from "@/components/admin/doctors";
+import AdminDashboardLayout from "@/components/dashboard/admin-dashboard";
 
 function DoctorsPage() {
   return (
     <AdminDashboardLayout>
       <AdminDoctors />
     </AdminDashboardLayout>
-  )
+  );
 }
 
-export default DoctorsPage
+export default DoctorsPage;

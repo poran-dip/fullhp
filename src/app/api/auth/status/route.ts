@@ -1,26 +1,26 @@
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const cookieStore = await cookies()
-  const patientId = cookieStore.get('patientId')?.value
-  const doctorId = cookieStore.get('doctorId')?.value
-  const adminId = cookieStore.get('adminId')?.value
-  const role = cookieStore.get('role')?.value
+  const cookieStore = await cookies();
+  const patientId = cookieStore.get("patientId")?.value;
+  const doctorId = cookieStore.get("doctorId")?.value;
+  const adminId = cookieStore.get("adminId")?.value;
+  const role = cookieStore.get("role")?.value;
 
   if (!role) {
     return NextResponse.json({
       authenticated: false,
-      user: null
-    })
+      user: null,
+    });
   }
 
   try {
-    let user = null
+    let user = null;
 
     switch (role) {
-      case 'PATIENT':
+      case "PATIENT":
         if (patientId) {
           user = await prisma.patient.findUnique({
             where: { id: patientId },
@@ -28,12 +28,12 @@ export async function GET() {
               id: true,
               name: true,
               email: true,
-            }
-          })
+            },
+          });
         }
-        break
+        break;
 
-      case 'DOCTOR':
+      case "DOCTOR":
         if (doctorId) {
           user = await prisma.doctor.findUnique({
             where: { id: doctorId },
@@ -42,13 +42,13 @@ export async function GET() {
               name: true,
               email: true,
               specialization: true,
-              status: true
-            }
-          })
+              status: true,
+            },
+          });
         }
-        break
+        break;
 
-      case 'ADMIN':
+      case "ADMIN":
         if (adminId) {
           user = await prisma.admin.findUnique({
             where: { id: adminId },
@@ -56,31 +56,37 @@ export async function GET() {
               id: true,
               name: true,
               email: true,
-            }
-          })
+            },
+          });
         }
-        break
+        break;
     }
 
-    return NextResponse.json({
-      authenticated: !!user,
-      user
-    }, {
-      headers: {
-        'Cache-Control': 'no-store'
-      }
-    })
+    return NextResponse.json(
+      {
+        authenticated: !!user,
+        user,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+    );
   } catch (error) {
-    console.error('Auth status check error:', error)
-    return NextResponse.json({
-      authenticated: false,
-      user: null,
-      error: 'Failed to verify authentication status'
-    }, { 
-      status: 500,
-      headers: {
-        'Cache-Control': 'no-store'
-      }
-    })
+    console.error("Auth status check error:", error);
+    return NextResponse.json(
+      {
+        authenticated: false,
+        user: null,
+        error: "Failed to verify authentication status",
+      },
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+    );
   }
 }

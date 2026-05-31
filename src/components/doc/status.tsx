@@ -1,8 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Clock, UserCheck, UserX, UserMinus, Info, Bell, AlertCircle } from 'lucide-react';
+import {
+  AlertCircle,
+  Bell,
+  Clock,
+  Info,
+  UserCheck,
+  UserMinus,
+  UserX,
+} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 
 interface Notification {
   title: string;
@@ -13,9 +26,9 @@ interface Notification {
 const DocStatus = () => {
   // Status options
   const STATUS = {
-    AVAILABLE: 'available',
-    OFF_DUTY: 'off-duty',
-    DND: 'do-not-disturb'
+    AVAILABLE: "available",
+    OFF_DUTY: "off-duty",
+    DND: "do-not-disturb",
   };
 
   // State
@@ -26,9 +39,22 @@ const DocStatus = () => {
 
   // Simulated work hours (in a real app, this would come from an API or settings)
   const workHours = {
-    start: '09:00',
-    end: '17:00'
+    start: "09:00",
+    end: "17:00",
   };
+
+  // Custom notification function (replacement for useToast)
+  const showNotification = useCallback(
+    (title: string, message: string, isError = false) => {
+      setNotification({ title, message, isError });
+
+      // Auto-dismiss after 3 seconds
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+    },
+    [],
+  );
 
   // For demo purposes, let's simulate checking if current time is within work hours
   useEffect(() => {
@@ -36,16 +62,19 @@ const DocStatus = () => {
     const checkWorkHours = () => {
       const now = new Date();
       const currentHour = now.getHours();
-      
+
       // Simple check if current hour is between 9 AM and 5 PM
       const isWorkHours = currentHour >= 9 && currentHour < 17;
-      
+
       // If work hours changed from off to on, set status to available
       if (isWorkHours && !isDuringWorkHours) {
         setCurrentStatus(STATUS.AVAILABLE);
-        showNotification("Work hours started", "Your status has been set to Available.");
+        showNotification(
+          "Work hours started",
+          "Your status has been set to Available.",
+        );
       }
-      
+
       setIsDuringWorkHours(isWorkHours);
     };
 
@@ -54,17 +83,7 @@ const DocStatus = () => {
     const interval = setInterval(checkWorkHours, 60000);
 
     return () => clearInterval(interval);
-  }, [isDuringWorkHours, STATUS.AVAILABLE]);
-
-  // Custom notification function (replacement for useToast)
-  const showNotification = (title: string, message: string, isError = false) => {
-    setNotification({ title, message, isError });
-    
-    // Auto-dismiss after 3 seconds
-    setTimeout(() => {
-      setNotification(null);
-    }, 3000);
-  };
+  }, [isDuringWorkHours, STATUS.AVAILABLE, showNotification]);
 
   // Toggle urgent cases simulation for demo
   const toggleUrgentCases = () => {
@@ -78,25 +97,29 @@ const DocStatus = () => {
       showNotification(
         "Cannot change status during work hours",
         "You must remain Available during scheduled work hours.",
-        true
+        true,
       );
       return;
     }
 
     // Set the new status
     setCurrentStatus(newStatus);
-    
+
     // Show notification of status change
     showNotification(
       "Status Updated",
-      `Your status is now ${newStatus.replace(/-/g, ' ')}`
+      `Your status is now ${newStatus.replace(/-/g, " ")}`,
     );
   };
 
   // Status card design and content
   const getStatusCard = (status: string) => {
     const isActive = currentStatus === status;
-    let icon, title, description, bgColor, textColor;
+    let icon: React.ReactNode,
+      title: string,
+      description: string,
+      bgColor: string,
+      textColor: string;
 
     switch (status) {
       case STATUS.AVAILABLE:
@@ -109,7 +132,8 @@ const DocStatus = () => {
       case STATUS.OFF_DUTY:
         icon = <UserMinus size={24} />;
         title = "Off Duty";
-        description = "You are not seeing regular patients but may receive urgent cases";
+        description =
+          "You are not seeing regular patients but may receive urgent cases";
         bgColor = isActive ? "bg-amber-100" : "";
         textColor = isActive ? "text-amber-800" : "";
         break;
@@ -125,7 +149,7 @@ const DocStatus = () => {
     }
 
     return (
-      <Card className={`${isActive ? 'border-2 border-blue-500' : ''} h-full`}>
+      <Card className={`${isActive ? "border-2 border-blue-500" : ""} h-full`}>
         <CardHeader className={`flex flex-row items-center gap-2 ${bgColor}`}>
           <div className={textColor}>{icon}</div>
           <div>
@@ -134,11 +158,11 @@ const DocStatus = () => {
           </div>
         </CardHeader>
         <CardFooter className="pt-4">
-          <Button 
-            variant={isActive ? "secondary" : "outline"} 
+          <Button
+            variant={isActive ? "secondary" : "outline"}
             className="w-full"
             onClick={() => changeStatus(status)}
-            disabled={(isDuringWorkHours && status !== STATUS.AVAILABLE)}
+            disabled={isDuringWorkHours && status !== STATUS.AVAILABLE}
           >
             {isActive ? "Current Status" : `Set to ${title}`}
           </Button>
@@ -151,9 +175,15 @@ const DocStatus = () => {
     <div className="space-y-6">
       {/* Simple notification system */}
       {notification && (
-        <div className={`p-4 rounded-lg ${notification.isError ? 'bg-red-100 border-red-200' : 'bg-blue-100 border-blue-200'} border`}>
+        <div
+          className={`p-4 rounded-lg ${notification.isError ? "bg-red-100 border-red-200" : "bg-blue-100 border-blue-200"} border`}
+        >
           <div className="flex items-center gap-2">
-            {notification.isError ? <AlertCircle className="text-red-600" size={20} /> : <Bell className="text-blue-600" size={20} />}
+            {notification.isError ? (
+              <AlertCircle className="text-red-600" size={20} />
+            ) : (
+              <Bell className="text-blue-600" size={20} />
+            )}
             <h4 className="font-medium">{notification.title}</h4>
           </div>
           <p className="mt-1 text-sm">{notification.message}</p>
@@ -163,18 +193,25 @@ const DocStatus = () => {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xl font-medium">Current Status</h3>
-          <p className="text-gray-500">Manage your availability for appointments</p>
+          <p className="text-gray-500">
+            Manage your availability for appointments
+          </p>
         </div>
-        <Badge 
-          variant="outline" 
+        <Badge
+          variant="outline"
           className={`${
-            currentStatus === STATUS.AVAILABLE ? 'bg-green-100 text-green-800' :
-            currentStatus === STATUS.OFF_DUTY ? 'bg-amber-100 text-amber-800' :
-            'bg-red-100 text-red-800'
-          } px-3 py-1 text-sm`}>
-          {currentStatus === STATUS.AVAILABLE ? 'Available' :
-           currentStatus === STATUS.OFF_DUTY ? 'Off Duty' :
-           'Do Not Disturb'}
+            currentStatus === STATUS.AVAILABLE
+              ? "bg-green-100 text-green-800"
+              : currentStatus === STATUS.OFF_DUTY
+                ? "bg-amber-100 text-amber-800"
+                : "bg-red-100 text-red-800"
+          } px-3 py-1 text-sm`}
+        >
+          {currentStatus === STATUS.AVAILABLE
+            ? "Available"
+            : currentStatus === STATUS.OFF_DUTY
+              ? "Off Duty"
+              : "Do Not Disturb"}
         </Badge>
       </div>
 
@@ -184,11 +221,16 @@ const DocStatus = () => {
           <Clock size={20} className="text-blue-600" />
           <div>
             <p className="font-medium">Work Hours</p>
-            <p className="text-sm text-gray-500">{workHours.start} - {workHours.end}</p>
+            <p className="text-sm text-gray-500">
+              {workHours.start} - {workHours.end}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={isDuringWorkHours ? "default" : "outline"} className="whitespace-nowrap">
+          <Badge
+            variant={isDuringWorkHours ? "default" : "outline"}
+            className="whitespace-nowrap"
+          >
             {isDuringWorkHours ? "In Work Hours" : "Outside Work Hours"}
           </Badge>
         </div>
@@ -205,11 +247,12 @@ const DocStatus = () => {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Info size={18} /> 
+            <Info size={18} />
             <h3 className="font-bold">Emergency Cases Simulation</h3>
           </div>
           <p className="text-sm text-gray-500">
-            For demonstration purposes only. In a real application, this would be managed automatically.
+            For demonstration purposes only. In a real application, this would
+            be managed automatically.
           </p>
         </CardHeader>
         <CardContent>
@@ -217,13 +260,13 @@ const DocStatus = () => {
             <div>
               <p className="font-medium">Urgent Cases Available</p>
               <p className="text-sm text-gray-500">
-                {hasUrgentCases ? 
-                  'There are urgent cases requiring attention' : 
-                  'No urgent cases at the moment'}
+                {hasUrgentCases
+                  ? "There are urgent cases requiring attention"
+                  : "No urgent cases at the moment"}
               </p>
             </div>
             {/* Custom toggle button instead of Switch */}
-            <Button 
+            <Button
               variant={hasUrgentCases ? "destructive" : "outline"}
               onClick={toggleUrgentCases}
               className="min-w-25"
@@ -242,8 +285,10 @@ const DocStatus = () => {
             <h4 className="font-medium">Urgent Cases Require Attention</h4>
           </div>
           <p className="mt-2 text-sm">
-            There are urgent cases that require your attention. Please check the appointments tab.
-            {currentStatus === STATUS.OFF_DUTY && " You will receive these notifications because you are Off Duty but not in Do Not Disturb mode."}
+            There are urgent cases that require your attention. Please check the
+            appointments tab.
+            {currentStatus === STATUS.OFF_DUTY &&
+              " You will receive these notifications because you are Off Duty but not in Do Not Disturb mode."}
           </p>
         </div>
       )}

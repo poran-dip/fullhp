@@ -1,18 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import Link from "next/link"
-import { Search } from "lucide-react"
-import Cookies from 'js-cookie'
-import { useRouter } from 'next/navigation'
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import Cookies from "js-cookie";
+import { Search } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Type for Doctor
 interface Doctor {
@@ -36,57 +41,58 @@ interface DoctorSearchProps {
   error: string | null;
 }
 
-export default function DoctorSearch({ doctors, isLoading, error }: DoctorSearchProps) {
-  const [specialty, setSpecialty] = useState("")
-  const [location, setLocation] = useState("")
-  const [searchResults, setSearchResults] = useState<Doctor[] | null>(null)
-  const [hasSearched, setHasSearched] = useState(false)
+export default function DoctorSearch({
+  doctors,
+  isLoading,
+  error,
+}: DoctorSearchProps) {
+  const [specialty, setSpecialty] = useState("");
+  const [location, setLocation] = useState("");
+  const [searchResults, setSearchResults] = useState<Doctor[] | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setHasSearched(true)
-    
+    e.preventDefault();
+    setHasSearched(true);
+
     // Filter doctors based on search criteria
     let results = doctors;
-    
+
     // Filter by specialty if not "All"
     if (specialty && specialty !== "All") {
-      results = results.filter(doctor => 
-        doctor.specialization === specialty
-      );
+      results = results.filter((doctor) => doctor.specialization === specialty);
     }
-    
+
     // Filter by location with partial matching
     if (location) {
       const locationLower = location.toLowerCase();
-      results = results.filter(doctor => 
-        doctor.location && 
-        doctor.location.toLowerCase().includes(locationLower)
+      results = results.filter((doctor) =>
+        doctor.location?.toLowerCase().includes(locationLower),
       );
     }
-    
+
     setSearchResults(results);
-  }
+  };
 
   // Reset search results when specialty or location changes
   const handleSpecialtyChange = (value: string) => {
-    setSpecialty(value)
-    setSearchResults(null)
-    setHasSearched(false)
-  }
+    setSpecialty(value);
+    setSearchResults(null);
+    setHasSearched(false);
+  };
 
   const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocation(e.target.value)
-    setSearchResults(null)
-    setHasSearched(false)
-  }
+    setLocation(e.target.value);
+    setSearchResults(null);
+    setHasSearched(false);
+  };
 
   const handleBookAppointment = (doctorId: string) => {
-    Cookies.set('selectedDoctorId', doctorId, { expires: 2/1440 })
-    router.push(`/book`)
-  }
+    Cookies.set("selectedDoctorId", doctorId, { expires: 2 / 1440 });
+    router.push(`/book`);
+  };
 
   if (isLoading) {
     return (
@@ -115,7 +121,10 @@ export default function DoctorSearch({ doctors, isLoading, error }: DoctorSearch
           <form onSubmit={handleSearch} className="space-y-0">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
               <div className="md:col-span-5">
-                <label htmlFor="specialty" className="text-sm font-medium block mb-2">
+                <label
+                  htmlFor="specialty"
+                  className="text-sm font-medium block mb-2"
+                >
                   Specialty
                 </label>
                 <Select value={specialty} onValueChange={handleSpecialtyChange}>
@@ -130,12 +139,17 @@ export default function DoctorSearch({ doctors, isLoading, error }: DoctorSearch
                     <SelectItem value="Orthopedics">Orthopedics</SelectItem>
                     <SelectItem value="Pediatrics">Pediatrics</SelectItem>
                     <SelectItem value="Psychiatry">Psychiatry</SelectItem>
-                    <SelectItem value="General Practice">General Practice</SelectItem>
+                    <SelectItem value="General Practice">
+                      General Practice
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="md:col-span-5">
-                <label htmlFor="location" className="text-sm font-medium block mb-2">
+                <label
+                  htmlFor="location"
+                  className="text-sm font-medium block mb-2"
+                >
                   Location
                 </label>
                 <Input
@@ -147,8 +161,8 @@ export default function DoctorSearch({ doctors, isLoading, error }: DoctorSearch
                 />
               </div>
               <div className="md:col-span-2 flex items-end">
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-black text-white hover:bg-gray-800"
                 >
                   <Search className="h-4 w-4 mr-2" />
@@ -165,8 +179,10 @@ export default function DoctorSearch({ doctors, isLoading, error }: DoctorSearch
           <Card>
             <CardContent className="p-6">
               <p className="text-lg text-muted-foreground">
-                No doctors found{specialty && specialty !== "All" ? ` for ${specialty}` : ''}{location ? ` in ${location}` : ''}. 
-                Please try different search criteria.
+                No doctors found
+                {specialty && specialty !== "All" ? ` for ${specialty}` : ""}
+                {location ? ` in ${location}` : ""}. Please try different search
+                criteria.
               </p>
             </CardContent>
           </Card>
@@ -182,12 +198,16 @@ export default function DoctorSearch({ doctors, isLoading, error }: DoctorSearch
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Avatar className="h-20 w-20">
-                      <AvatarImage 
-                        src={doctor.image || "/placeholder.svg?height=100&width=100"} 
-                        alt={doctor.name || "Doctor"} 
+                      <AvatarImage
+                        src={
+                          doctor.image ||
+                          "/placeholder.svg?height=100&width=100"
+                        }
+                        alt={doctor.name || "Doctor"}
                       />
                       <AvatarFallback>
-                        {doctor.name?.split(" ")
+                        {doctor.name
+                          ?.split(" ")
                           .map((n: string) => n[0])
                           .join("") || "DR"}
                       </AvatarFallback>
@@ -195,7 +215,9 @@ export default function DoctorSearch({ doctors, isLoading, error }: DoctorSearch
                     <div className="flex-1 space-y-2">
                       <div>
                         <h4 className="text-lg font-semibold">{doctor.name}</h4>
-                        <p className="text-sm text-muted-foreground">{doctor.specialization}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {doctor.specialization}
+                        </p>
                       </div>
                       <div className="flex items-center">
                         <div className="flex text-yellow-400">
@@ -203,11 +225,13 @@ export default function DoctorSearch({ doctors, isLoading, error }: DoctorSearch
                             .fill(null)
                             .map((_, i) => (
                               <svg
+                                // biome-ignore lint: static list
                                 key={i}
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24"
                                 fill="currentColor"
                                 className={`w-4 h-4 ${i < Math.floor(doctor.rating) ? "opacity-100" : "opacity-30"}`}
+                                aria-hidden="true"
                               >
                                 <path
                                   fillRule="evenodd"
@@ -233,7 +257,10 @@ export default function DoctorSearch({ doctors, isLoading, error }: DoctorSearch
                       </div>
                     </div>
                     <div className="flex items-center sm:flex-col sm:items-end gap-2 mt-4 sm:mt-0">
-                      <Button className="bg-black text-white cursor-pointer hover:bg-gray-800" onClick={() => handleBookAppointment(doctor.id)}>
+                      <Button
+                        className="bg-black text-white cursor-pointer hover:bg-gray-800"
+                        onClick={() => handleBookAppointment(doctor.id)}
+                      >
                         Book Appointment
                       </Button>
                       <Button variant="outline" asChild>
@@ -248,5 +275,5 @@ export default function DoctorSearch({ doctors, isLoading, error }: DoctorSearch
         </div>
       )}
     </div>
-  )
+  );
 }

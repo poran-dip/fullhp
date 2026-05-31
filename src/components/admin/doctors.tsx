@@ -1,25 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogClose 
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+import { Calendar, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import ProfileImageUploader from "@/components/ProfileImageUploader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,10 +15,27 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Search, Pencil, Trash2, Plus, Calendar } from 'lucide-react';
-import { toast } from 'sonner';
-import Link from 'next/link';
-import ProfileImageUploader from '@/components/ProfileImageUploader';
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // Define types based on Prisma schema
 interface Doctor {
@@ -60,7 +62,7 @@ interface Appointment {
   id: string;
   dateTime: Date | string | null;
   condition: string | null;
-  status: 'NEW' | 'PENDING' | 'COMPLETED' | 'CANCELED';
+  status: "NEW" | "PENDING" | "COMPLETED" | "CANCELED";
   patient: {
     id: string;
     name: string | null;
@@ -80,8 +82,10 @@ const AppointmentView: React.FC<AppointmentViewProps> = ({ doctor }) => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Appointments for {doctor.name}</h2>
-      
+      <h2 className="text-xl font-semibold mb-4">
+        Appointments for {doctor.name}
+      </h2>
+
       {appointments.length === 0 ? (
         <div className="bg-gray-50 p-4 rounded-md text-center">
           <p>No appointments scheduled for this doctor.</p>
@@ -91,31 +95,57 @@ const AppointmentView: React.FC<AppointmentViewProps> = ({ doctor }) => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient Name</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Condition</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Patient Name
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Date & Time
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Condition
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Status
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {appointments.map((appointment) => (
                 <tr key={appointment.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {appointment.patient?.user?.name || appointment.patient?.name || 'Unknown'}
+                    {appointment.patient?.user?.name ||
+                      appointment.patient?.name ||
+                      "Unknown"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {appointment.dateTime ? new Date(appointment.dateTime).toLocaleString() : 'Not scheduled'}
+                    {appointment.dateTime
+                      ? new Date(appointment.dateTime).toLocaleString()
+                      : "Not scheduled"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {appointment.condition || 'Not specified'}
+                    {appointment.condition || "Not specified"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium
-                      ${appointment.status === 'NEW' ? 'bg-blue-100 text-blue-800' : ''}
-                      ${appointment.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : ''}
-                      ${appointment.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : ''}
-                      ${appointment.status === 'CANCELED' ? 'bg-red-100 text-red-800' : ''}
-                    `}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium
+                      ${appointment.status === "NEW" ? "bg-blue-100 text-blue-800" : ""}
+                      ${appointment.status === "PENDING" ? "bg-yellow-100 text-yellow-800" : ""}
+                      ${appointment.status === "COMPLETED" ? "bg-green-100 text-green-800" : ""}
+                      ${appointment.status === "CANCELED" ? "bg-red-100 text-red-800" : ""}
+                    `}
+                    >
                       {appointment.status}
                     </span>
                   </td>
@@ -133,8 +163,8 @@ const AdminDoctors: React.FC = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+
   // Doctor form state
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -142,60 +172,61 @@ const AdminDoctors: React.FC = () => {
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
   const [currentDoctor, setCurrentDoctor] = useState<Doctor | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Form fields
-  const [formName, setFormName] = useState('');
-  const [formEmail, setFormEmail] = useState('');
-  const [formPassword, setFormPassword] = useState('');
-  const [formSpecialization, setFormSpecialization] = useState('');
-  const [formLocation, setFormLocation] = useState('');
-  const [formImage, setFormImage] = useState('');
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formPassword, setFormPassword] = useState("");
+  const [formSpecialization, setFormSpecialization] = useState("");
+  const [formLocation, setFormLocation] = useState("");
+  const [formImage, setFormImage] = useState("");
 
-  // Fetch doctors from API
-  useEffect(() => {
-    fetchDoctors();
-  }, []);
-
-  const fetchDoctors = async () => {
+  const fetchDoctors = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/doctors');
+      const response = await fetch("/api/doctors");
       if (!response.ok) {
-        throw new Error('Failed to fetch doctors');
+        throw new Error("Failed to fetch doctors");
       }
       const data = await response.json();
 
       const doctors = data;
       const doctorsWithCount = doctors.map((doctor: Doctor) => ({
         ...doctor,
-        appointmentCount: doctor.appointments?.length || 0
+        appointmentCount: doctor.appointments?.length || 0,
       }));
-      
+
       setDoctors(doctorsWithCount);
       setFilteredDoctors(doctorsWithCount);
     } catch (error) {
-      console.error('Error fetching doctors:', error);
+      console.error("Error fetching doctors:", error);
       toast.error("Error", {
         description: "Failed to fetch doctors. Please try again later.",
       });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // Fetch doctors from API
+  useEffect(() => {
+    fetchDoctors();
+  }, [fetchDoctors]);
 
   // Search functionality
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
-    
-    if (term.trim() === '') {
+
+    if (term.trim() === "") {
       setFilteredDoctors(doctors);
     } else {
-      const filtered = doctors.filter(doctor => 
-        doctor.name.toLowerCase().includes(term) || 
-        doctor.email.toLowerCase().includes(term) ||
-        doctor.specialization.toLowerCase().includes(term) ||
-        (doctor.location && doctor.location.toLowerCase().includes(term))
+      const filtered = doctors.filter(
+        (doctor) =>
+          doctor.name.toLowerCase().includes(term) ||
+          doctor.email.toLowerCase().includes(term) ||
+          doctor.specialization.toLowerCase().includes(term) ||
+          doctor.location?.toLowerCase().includes(term),
       );
       setFilteredDoctors(filtered);
     }
@@ -204,12 +235,12 @@ const AdminDoctors: React.FC = () => {
   // Add doctor
   const handleAddDoctor = () => {
     // Reset form
-    setFormName('');
-    setFormEmail('');
-    setFormPassword('');
-    setFormSpecialization('');
-    setFormLocation('');
-    setFormImage('');
+    setFormName("");
+    setFormEmail("");
+    setFormPassword("");
+    setFormSpecialization("");
+    setFormLocation("");
+    setFormImage("");
     setIsAddDialogOpen(true);
   };
 
@@ -235,17 +266,17 @@ const AdminDoctors: React.FC = () => {
       if (formLocation) doctorData.location = formLocation;
       if (formImage) doctorData.image = formImage;
 
-      const response = await fetch('/api/doctors', {
-        method: 'POST',
+      const response = await fetch("/api/doctors", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(doctorData),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to add doctor');
+        throw new Error(error.error || "Failed to add doctor");
       }
 
       await fetchDoctors();
@@ -254,9 +285,10 @@ const AdminDoctors: React.FC = () => {
         description: "Doctor added successfully",
       });
     } catch (error) {
-      console.error('Error adding doctor:', error);
+      console.error("Error adding doctor:", error);
       toast.error("Error", {
-        description: error instanceof Error ? error.message : "Failed to add doctor",
+        description:
+          error instanceof Error ? error.message : "Failed to add doctor",
       });
     } finally {
       setIsSubmitting(false);
@@ -268,10 +300,10 @@ const AdminDoctors: React.FC = () => {
     setCurrentDoctor(doctor);
     setFormName(doctor.name);
     setFormEmail(doctor.email);
-    setFormPassword(''); // Don't populate password for security
+    setFormPassword(""); // Don't populate password for security
     setFormSpecialization(doctor.specialization);
-    setFormLocation(doctor.location || '');
-    setFormImage(doctor.image || '');
+    setFormLocation(doctor.location || "");
+    setFormImage(doctor.image || "");
     setIsEditDialogOpen(true);
   };
 
@@ -283,7 +315,7 @@ const AdminDoctors: React.FC = () => {
       });
       return;
     }
-    
+
     setIsSubmitting(true);
     try {
       const requestBody: DoctorRequest = {
@@ -293,7 +325,7 @@ const AdminDoctors: React.FC = () => {
         location: formLocation || undefined,
         image: formImage || undefined,
       };
-      
+
       // Only include password if it was changed
       if (formPassword) {
         requestBody.password = formPassword;
@@ -301,16 +333,16 @@ const AdminDoctors: React.FC = () => {
 
       // Changed from PATCH to PUT to match your API route
       const response = await fetch(`/api/doctors/${currentDoctor.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to update doctor');
+        throw new Error(error.error || "Failed to update doctor");
       }
 
       await fetchDoctors();
@@ -319,9 +351,10 @@ const AdminDoctors: React.FC = () => {
         description: "Doctor updated successfully",
       });
     } catch (error) {
-      console.error('Error updating doctor:', error);
+      console.error("Error updating doctor:", error);
       toast.error("Error", {
-        description: error instanceof Error ? error.message : "Failed to update doctor",
+        description:
+          error instanceof Error ? error.message : "Failed to update doctor",
       });
     } finally {
       setIsSubmitting(false);
@@ -336,16 +369,16 @@ const AdminDoctors: React.FC = () => {
 
   const confirmDelete = async () => {
     if (!currentDoctor) return;
-    
+
     setIsSubmitting(true);
     try {
       const response = await fetch(`/api/doctors/${currentDoctor.id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to delete doctor');
+        throw new Error(error.error || "Failed to delete doctor");
       }
 
       await fetchDoctors();
@@ -354,9 +387,10 @@ const AdminDoctors: React.FC = () => {
         description: "Doctor deleted successfully",
       });
     } catch (error) {
-      console.error('Error deleting doctor:', error);
+      console.error("Error deleting doctor:", error);
       toast.error("Error", {
-        description: error instanceof Error ? error.message : "Failed to delete doctor",
+        description:
+          error instanceof Error ? error.message : "Failed to delete doctor",
       });
     } finally {
       setIsSubmitting(false);
@@ -370,14 +404,14 @@ const AdminDoctors: React.FC = () => {
       // Fetch detailed doctor info including appointments
       const response = await fetch(`/api/doctors/${doctor.id}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch doctor appointments');
+        throw new Error("Failed to fetch doctor appointments");
       }
       const doctorWithAppointments = await response.json();
-      
+
       setCurrentDoctor(doctorWithAppointments);
       setIsAppointmentDialogOpen(true);
     } catch (error) {
-      console.error('Error fetching appointments:', error);
+      console.error("Error fetching appointments:", error);
       toast.error("Error", {
         description: "Failed to fetch doctor appointments",
       });
@@ -399,8 +433,11 @@ const AdminDoctors: React.FC = () => {
             className="grow"
           />
         </div>
-        
-        <Button onClick={handleAddDoctor} className="flex items-center bg-green-600 hover:bg-green-700">
+
+        <Button
+          onClick={handleAddDoctor}
+          className="flex items-center bg-green-600 hover:bg-green-700"
+        >
           <Plus className="mr-2 h-4 w-4" /> Add New Doctor
         </Button>
 
@@ -435,7 +472,10 @@ const AdminDoctors: React.FC = () => {
               </TableRow>
             ) : filteredDoctors.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-6 text-gray-500">
+                <TableCell
+                  colSpan={7}
+                  className="text-center py-6 text-gray-500"
+                >
                   No doctors found
                 </TableCell>
               </TableRow>
@@ -445,9 +485,11 @@ const AdminDoctors: React.FC = () => {
                   <TableCell>
                     {doctor.image ? (
                       <div className="w-10 h-10 rounded-full overflow-hidden">
-                        <img 
-                          src={doctor.image} 
-                          alt={`Dr. ${doctor.name}`} 
+                        <Image
+                          src={doctor.image}
+                          alt={`Dr. ${doctor.name}`}
+                          height={40}
+                          width={40}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -462,7 +504,7 @@ const AdminDoctors: React.FC = () => {
                   <TableCell className="font-medium">{doctor.name}</TableCell>
                   <TableCell>{doctor.email}</TableCell>
                   <TableCell>{doctor.specialization}</TableCell>
-                  <TableCell>{doctor.location || '-'}</TableCell>
+                  <TableCell>{doctor.location || "-"}</TableCell>
                   <TableCell>{doctor.appointmentCount || 0}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
@@ -506,7 +548,7 @@ const AdminDoctors: React.FC = () => {
               Enter the doctor&apos;s details below
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
@@ -519,7 +561,7 @@ const AdminDoctors: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">
                 Email
@@ -532,7 +574,7 @@ const AdminDoctors: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="password" className="text-right">
                 Password
@@ -545,7 +587,7 @@ const AdminDoctors: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="specialization" className="text-right">
                 Specialization
@@ -582,15 +624,23 @@ const AdminDoctors: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <DialogFooter className="sm:justify-end">
             <DialogClose asChild>
-              <Button variant="secondary" disabled={isSubmitting}>Cancel</Button>
+              <Button variant="secondary" disabled={isSubmitting}>
+                Cancel
+              </Button>
             </DialogClose>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={submitNewDoctor}
-              disabled={isSubmitting || !formName || !formEmail || !formPassword || !formSpecialization}
+              disabled={
+                isSubmitting ||
+                !formName ||
+                !formEmail ||
+                !formPassword ||
+                !formSpecialization
+              }
             >
               {isSubmitting ? "Adding..." : "Add Doctor"}
             </Button>
@@ -607,7 +657,7 @@ const AdminDoctors: React.FC = () => {
               Update the doctor&apos;s details below
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-name" className="text-right">
@@ -620,7 +670,7 @@ const AdminDoctors: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-email" className="text-right">
                 Email
@@ -633,7 +683,7 @@ const AdminDoctors: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-password" className="text-right">
                 Password
@@ -647,7 +697,7 @@ const AdminDoctors: React.FC = () => {
                 className="col-span-3"
               />
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-specialization" className="text-right">
                 Specialization
@@ -684,15 +734,19 @@ const AdminDoctors: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <DialogFooter className="sm:justify-end">
             <DialogClose asChild>
-              <Button variant="secondary" disabled={isSubmitting}>Cancel</Button>
+              <Button variant="secondary" disabled={isSubmitting}>
+                Cancel
+              </Button>
             </DialogClose>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={submitEditedDoctor}
-              disabled={isSubmitting || !formName || !formEmail || !formSpecialization}
+              disabled={
+                isSubmitting || !formName || !formEmail || !formSpecialization
+              }
             >
               {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
@@ -701,19 +755,24 @@ const AdminDoctors: React.FC = () => {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete {currentDoctor?.name}&apos;s record and might affect appointments.
-              This action cannot be undone.
+              This will permanently delete {currentDoctor?.name}&apos;s record
+              and might affect appointments. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDelete} 
+            <AlertDialogCancel disabled={isSubmitting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
               className="bg-red-500 hover:bg-red-600"
               disabled={isSubmitting}
             >
@@ -724,7 +783,10 @@ const AdminDoctors: React.FC = () => {
       </AlertDialog>
 
       {/* View Appointments Dialog */}
-      <Dialog open={isAppointmentDialogOpen} onOpenChange={setIsAppointmentDialogOpen}>
+      <Dialog
+        open={isAppointmentDialogOpen}
+        onOpenChange={setIsAppointmentDialogOpen}
+      >
         <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Doctor&apos;s Appointments</DialogTitle>
@@ -732,15 +794,13 @@ const AdminDoctors: React.FC = () => {
               Viewing all appointments for {currentDoctor?.name}
             </DialogDescription>
           </DialogHeader>
-          
+
           {currentDoctor && (
             <div className="py-2">
-              <AppointmentView 
-                doctor={currentDoctor}
-              />
+              <AppointmentView doctor={currentDoctor} />
             </div>
           )}
-          
+
           <DialogFooter className="pt-2">
             <DialogClose asChild>
               <Button>Close</Button>

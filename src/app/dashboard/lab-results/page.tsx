@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import PatientDashboardLayout from "@/components/dashboard/patient-dashboard"
-import LabResultsList from "@/components/dashboard/lab-results-list"
+import LabResultsList from "@/components/dashboard/lab-results-list";
+import PatientDashboardLayout from "@/components/dashboard/patient-dashboard";
 
 function LabResultsPage() {
   return (
     <PatientDashboardLayout>
       <LabResultsList />
     </PatientDashboardLayout>
-  )
+  );
 }
 
-export default LabResultsPage
+export default LabResultsPage;

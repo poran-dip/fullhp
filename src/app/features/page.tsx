@@ -1,12 +1,17 @@
-import React from 'react';
-import Link from 'next/link';
-import Navbar from '@/components/navbar';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
-import PatientLoginButton from '@/components/demo/patient-login-button';
-import DoctorLoginButton from '@/components/demo/doctor-login-button';
-import AdminLoginButton from '@/components/demo/admin-login-button';
+import { Check } from "lucide-react";
+import Link from "next/link";
+import AdminLoginButton from "@/components/demo/admin-login-button";
+import DoctorLoginButton from "@/components/demo/doctor-login-button";
+import PatientLoginButton from "@/components/demo/patient-login-button";
+import Navbar from "@/components/navbar";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function FeaturesPage() {
   const patientFeatures = [
@@ -15,7 +20,7 @@ export default function FeaturesPage() {
     "Easy Online Booking",
     "Digital Prescription Tracking",
     "Test Result Management",
-    "Comprehensive Medical History"
+    "Comprehensive Medical History",
   ];
 
   const doctorFeatures = [
@@ -23,7 +28,7 @@ export default function FeaturesPage() {
     "Digital Patient Records",
     "Reduced Paperwork",
     "Real-Time Patient Insights",
-    "Seamless Communication Tools"
+    "Seamless Communication Tools",
   ];
 
   const adminFeatures = [
@@ -31,23 +36,25 @@ export default function FeaturesPage() {
     "Staff and Patient Management",
     "Appointment Tracking",
     "Resource Allocation Insights",
-    "Performance Analytics"
+    "Performance Analytics",
   ];
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-12 max-w-6xl">
-        <h1 className="text-4xl font-bold text-center mb-12">Platform Features</h1>
-        
+        <h1 className="text-4xl font-bold text-center mb-12">
+          Platform Features
+        </h1>
+
         <div className="grid md:grid-cols-3 gap-8">
           <Card className="flex flex-col">
             <CardHeader>
               <CardTitle className="text-center">For Patients</CardTitle>
             </CardHeader>
             <CardContent className="grow">
-              {patientFeatures.map((feature, index) => (
-                <div key={index} className="flex items-center mb-2">
+              {patientFeatures.map((feature) => (
+                <div key={feature} className="flex items-center mb-2">
                   <Check className="mr-2 text-green-500" />
                   <span>{feature}</span>
                 </div>
@@ -73,8 +80,8 @@ export default function FeaturesPage() {
               <CardTitle className="text-center">For Doctors</CardTitle>
             </CardHeader>
             <CardContent className="grow">
-              {doctorFeatures.map((feature, index) => (
-                <div key={index} className="flex items-center mb-2">
+              {doctorFeatures.map((feature) => (
+                <div key={feature} className="flex items-center mb-2">
                   <Check className="mr-2 text-blue-500" />
                   <span>{feature}</span>
                 </div>
@@ -100,8 +107,8 @@ export default function FeaturesPage() {
               <CardTitle className="text-center">For Administrators</CardTitle>
             </CardHeader>
             <CardContent className="grow">
-              {adminFeatures.map((feature, index) => (
-                <div key={index} className="flex items-center mb-2">
+              {adminFeatures.map((feature) => (
+                <div key={feature} className="flex items-center mb-2">
                   <Check className="mr-2 text-purple-500" />
                   <span>{feature}</span>
                 </div>

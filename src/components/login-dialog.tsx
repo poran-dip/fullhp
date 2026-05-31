@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,212 +13,219 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Separator } from "@/components/ui/separator"
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface LoginDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
-  const [activeTab, setActiveTab] = useState("login")
+  const [activeTab, setActiveTab] = useState("login");
   const [registerData, setRegisterData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     age: undefined as number | undefined,
-    gender: ''
-  })
+    gender: "",
+  });
   const [loginData, setLoginData] = useState({
-    email: '',
-    password: ''
-  })
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setRegisterData(prev => ({ 
-      ...prev, 
-      [name]: name === 'age' ? (value ? parseInt(value) : undefined) : value 
-    }))
-  }
+    const { name, value } = e.target;
+    setRegisterData((prev) => ({
+      ...prev,
+      [name]:
+        name === "age" ? (value ? parseInt(value, 10) : undefined) : value,
+    }));
+  };
 
   const handleGenderChange = (value: string) => {
-    setRegisterData(prev => ({ ...prev, gender: value }))
-  }
-  
+    setRegisterData((prev) => ({ ...prev, gender: value }));
+  };
+
   const handleRegisterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     // Check existing login status first
     try {
-      const statusResponse = await fetch('/api/auth/status')
-      const statusData = await statusResponse.json()
-      
+      const statusResponse = await fetch("/api/auth/status");
+      const statusData = await statusResponse.json();
+
       if (statusData.isLoggedIn) {
-        setError('You are already signed in. Please sign out first.')
-        setIsLoading(false)
-        return
+        setError("You are already signed in. Please sign out first.");
+        setIsLoading(false);
+        return;
       }
     } catch (error) {
-      console.error('Error checking login status:', error)
+      console.error("Error checking login status:", error);
     }
 
     if (registerData.password !== registerData.confirmPassword) {
-      setError('Passwords do not match')
-      setIsLoading(false)
-      return
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
     }
 
     try {
-      const response = await fetch('/api/patients', {
-        method: 'POST',
+      const response = await fetch("/api/patients", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: registerData.name,
           email: registerData.email,
           password: registerData.password,
           age: registerData.age,
-          gender: registerData.gender
-        })
-      })
+          gender: registerData.gender,
+        }),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error?.[0]?.message || data.error || 'An error occurred. Please try again.')
-        setIsLoading(false)
-        return
+        setError(
+          data.error?.[0]?.message ||
+            data.error ||
+            "An error occurred. Please try again.",
+        );
+        setIsLoading(false);
+        return;
       }
 
       // Automatically log in after successful registration
-      const loginResponse = await fetch('/api/patients/login', {
-        method: 'POST',
+      const loginResponse = await fetch("/api/patients/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: registerData.email,
           password: registerData.password,
-          role: 'patient'
-        })
-      })
+          role: "patient",
+        }),
+      });
 
-      const loginData = await loginResponse.json()
+      const loginData = await loginResponse.json();
 
       if (!loginResponse.ok) {
-        setError(loginData.error || 'Login failed after registration')
-        setIsLoading(false)
-        return
+        setError(loginData.error || "Login failed after registration");
+        setIsLoading(false);
+        return;
       }
 
-      localStorage.setItem('patientId', data.patientId)
-      localStorage.setItem('isLoggedIn', 'true')
-      localStorage.setItem('role', 'patient')
-      
+      localStorage.setItem("patientId", data.patientId);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("role", "patient");
+
       // Redirect to dashboard
-      onOpenChange(false)
-      router.push('/dashboard')
+      onOpenChange(false);
+      router.push("/dashboard");
     } catch (error) {
-      setError('An error occurred. Please try again.')
-      console.error('Registration error:', error)
+      setError("An error occurred. Please try again.");
+      console.error("Registration error:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setLoginData(prev => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setLoginData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     try {
       // First check existing login status
-      const statusResponse = await fetch('/api/auth/status')
-      const statusData = await statusResponse.json()
-      
+      const statusResponse = await fetch("/api/auth/status");
+      const statusData = await statusResponse.json();
+
       if (statusData.isLoggedIn) {
         // Determine the current logged-in role
-        const loggedInRole = statusData.role
-        
-        if (loggedInRole === 'doctor' || loggedInRole === 'admin') {
-          setError('You are already signed in as a doctor or admin. Please sign out first.')
-          setIsLoading(false)
-          return
+        const loggedInRole = statusData.role;
+
+        if (loggedInRole === "doctor" || loggedInRole === "admin") {
+          setError(
+            "You are already signed in as a doctor or admin. Please sign out first.",
+          );
+          setIsLoading(false);
+          return;
         }
       }
 
       // Attempt login
-      const response = await fetch('/api/patients/login', {
-        method: 'POST',
+      const response = await fetch("/api/patients/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: loginData.email,
           password: loginData.password,
-          role: 'patient'
-        })
-      })
+          role: "patient",
+        }),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Invalid credentials')
-        setIsLoading(false)
-        return
+        setError(data.error || "Invalid credentials");
+        setIsLoading(false);
+        return;
       }
 
       // Close dialog and redirect
-      onOpenChange(false)
-      router.push('/dashboard')
+      onOpenChange(false);
+      router.push("/dashboard");
     } catch (error) {
-      setError('An error occurred. Please try again.')
-      console.error('Login error:', error)
+      setError("An error occurred. Please try again.");
+      console.error("Login error:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleGoogleSignin = async () => {
     setIsLoading(true);
     try {
       // Check existing login status first
-      const statusResponse = await fetch('/api/auth/status')
-      const statusData = await statusResponse.json()
-      
+      const statusResponse = await fetch("/api/auth/status");
+      const statusData = await statusResponse.json();
+
       if (statusData.isLoggedIn) {
-        setError('You are already signed in. Please sign out first.')
-        setIsLoading(false)
-        return
+        setError("You are already signed in. Please sign out first.");
+        setIsLoading(false);
+        return;
       }
 
       const result = await signIn("google", {
         callbackUrl: "/dashboard",
-        redirect: true
+        redirect: true,
       });
       console.log(result);
     } catch (error) {
@@ -232,7 +239,12 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-106.25 p-4 sm:p-6 max-w-[90vw]">
-        <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs
+          defaultValue="login"
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login" className="text-xs sm:text-sm">
               Login
@@ -243,7 +255,9 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
           </TabsList>
           <TabsContent value="login">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl">Login to your account</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl">
+                Login to your account
+              </DialogTitle>
               <DialogDescription className="text-xs sm:text-sm">
                 Enter your email and password to access your account.
               </DialogDescription>
@@ -270,14 +284,17 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                     <Label htmlFor="password" className="text-xs sm:text-sm">
                       Password
                     </Label>
-                    <Link href="#" className="text-xs sm:text-sm text-primary hover:underline">
+                    <Link
+                      href="#"
+                      className="text-xs sm:text-sm text-primary hover:underline"
+                    >
                       Forgot password?
                     </Link>
                   </div>
-                  <Input 
-                    id="password" 
+                  <Input
+                    id="password"
                     type="password"
-                    name="password" 
+                    name="password"
                     className="text-xs sm:text-sm h-8 sm:h-10"
                     value={loginData.password}
                     onChange={handleLoginChange}
@@ -291,12 +308,12 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 )}
               </div>
               <DialogFooter>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full text-xs sm:text-sm h-8 sm:h-10"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Loading...' : 'Login'}
+                  {isLoading ? "Loading..." : "Login"}
                 </Button>
               </DialogFooter>
             </form>
@@ -305,18 +322,24 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 <Separator className="w-full" />
               </div>
               <div className="relative flex justify-center text-[10px] sm:text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
               </div>
             </div>
 
-            <Button 
-              variant="outline" 
-              className="w-full text-xs sm:text-sm h-8 sm:h-10" 
-              type="button" 
-              onClick={handleGoogleSignin} 
+            <Button
+              variant="outline"
+              className="w-full text-xs sm:text-sm h-8 sm:h-10"
+              type="button"
+              onClick={handleGoogleSignin}
               disabled={isLoading}
             >
-              <svg viewBox="0 0 24 24" className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"
+                aria-hidden="true"
+              >
                 <path
                   d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z"
                   fill="#EA4335"
@@ -334,19 +357,25 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                   fill="#34A853"
                 />
               </svg>
-              {isLoading ? 'Loading...' : 'Sign in with Google'}
+              {isLoading ? "Loading..." : "Sign in with Google"}
             </Button>
 
             <div className="mt-3 sm:mt-4 text-center text-xs sm:text-sm">
               <span>Not registered? </span>
-              <button onClick={() => setActiveTab("register")} className="text-primary hover:underline">
+              <button
+                type="button"
+                onClick={() => setActiveTab("register")}
+                className="text-primary hover:underline"
+              >
                 Create an account
               </button>
             </div>
           </TabsContent>
           <TabsContent value="register">
             <DialogHeader>
-              <DialogTitle className="text-lg sm:text-xl">Create an account</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl">
+                Create an account
+              </DialogTitle>
               <DialogDescription className="text-xs sm:text-sm">
                 Fill in the information below to create your account.
               </DialogDescription>
@@ -368,7 +397,10 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                   />
                 </div>
                 <div className="grid gap-1 sm:gap-2">
-                  <Label htmlFor="register-email" className="text-xs sm:text-sm">
+                  <Label
+                    htmlFor="register-email"
+                    className="text-xs sm:text-sm"
+                  >
                     Email
                   </Label>
                   <Input
@@ -392,7 +424,7 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                       name="age"
                       type="number"
                       placeholder="Age"
-                      value={registerData.age ?? ''}
+                      value={registerData.age ?? ""}
                       onChange={handleRegisterChange}
                       className="text-xs sm:text-sm h-8 sm:h-10"
                       min={0}
@@ -403,8 +435,8 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                     <Label htmlFor="gender" className="text-xs sm:text-sm">
                       Gender
                     </Label>
-                    <Select 
-                      value={registerData.gender} 
+                    <Select
+                      value={registerData.gender}
                       onValueChange={handleGenderChange}
                     >
                       <SelectTrigger className="text-xs sm:text-sm h-8 sm:h-10">
@@ -419,7 +451,10 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                   </div>
                 </div>
                 <div className="grid gap-1 sm:gap-2">
-                  <Label htmlFor="register-password" className="text-xs sm:text-sm">
+                  <Label
+                    htmlFor="register-password"
+                    className="text-xs sm:text-sm"
+                  >
                     Password
                   </Label>
                   <Input
@@ -434,7 +469,10 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                   />
                 </div>
                 <div className="grid gap-1 sm:gap-2">
-                  <Label htmlFor="confirm-password" className="text-xs sm:text-sm">
+                  <Label
+                    htmlFor="confirm-password"
+                    className="text-xs sm:text-sm"
+                  >
                     Confirm Password
                   </Label>
                   <Input
@@ -455,12 +493,12 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 )}
               </div>
               <DialogFooter>
-                <Button 
-                  type="submit" 
-                  className="w-full text-xs sm:text-sm h-8 sm:h-10" 
+                <Button
+                  type="submit"
+                  className="w-full text-xs sm:text-sm h-8 sm:h-10"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Loading...' : 'Create Account'}
+                  {isLoading ? "Loading..." : "Create Account"}
                 </Button>
               </DialogFooter>
             </form>
@@ -470,18 +508,24 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 <Separator className="w-full" />
               </div>
               <div className="relative flex justify-center text-[10px] sm:text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
               </div>
             </div>
 
-            <Button 
-              variant="outline" 
-              className="w-full text-xs sm:text-sm h-8 sm:h-10" 
+            <Button
+              variant="outline"
+              className="w-full text-xs sm:text-sm h-8 sm:h-10"
               type="button"
-              onClick={handleGoogleSignin} 
+              onClick={handleGoogleSignin}
               disabled={isLoading}
             >
-              <svg viewBox="0 0 24 24" className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4"
+                aria-hidden="true"
+              >
                 <path
                   d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z"
                   fill="#EA4335"
@@ -499,12 +543,16 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                   fill="#34A853"
                 />
               </svg>
-              {isLoading ? 'Loading...' : 'Sign up with Google'}
+              {isLoading ? "Loading..." : "Sign up with Google"}
             </Button>
 
             <div className="mt-3 sm:mt-4 text-center text-xs sm:text-sm">
               Already have an account?{" "}
-              <button onClick={() => setActiveTab("login")} className="text-primary hover:underline">
+              <button
+                type="button"
+                onClick={() => setActiveTab("login")}
+                className="text-primary hover:underline"
+              >
                 Login
               </button>
             </div>
@@ -512,5 +560,5 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
         </Tabs>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

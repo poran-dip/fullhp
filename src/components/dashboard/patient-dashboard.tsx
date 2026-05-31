@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { 
-  Calendar, 
-  FileText, 
-  Home, 
-  LayoutDashboard, 
-  Menu, 
-  Settings, 
+import {
+  Calendar,
+  FileText,
+  Home,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Settings,
   UserIcon,
-  LogOut
-} from "lucide-react"
-import InitialAvatar from "@/components/initial-avatar"
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import type React from "react";
+import { useEffect, useState } from "react";
+import InitialAvatar from "@/components/initial-avatar";
 
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Sidebar,
   SidebarContent,
@@ -27,34 +27,36 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 interface PatientDashboardLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
-export default function PatientDashboardLayout({ children }: PatientDashboardLayoutProps) {
-  const pathname = usePathname()
-  const router = useRouter()
-  const [isMounted, setIsMounted] = useState(false)
+export default function PatientDashboardLayout({
+  children,
+}: PatientDashboardLayoutProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
 
   // Prevent hydration errors by only rendering client components after mount
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    setIsMounted(true);
+  }, []);
 
   const handleSignOut = () => {
     // Remove authentication-related items from localStorage
-    localStorage.removeItem('isLoggedIn')
-    localStorage.removeItem('patientId')
-    localStorage.removeItem('role')
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("patientId");
+    localStorage.removeItem("role");
 
     // Redirect to login page
-    router.push('/')
-  }
+    router.push("/");
+  };
 
   if (!isMounted) {
-    return null
+    return null;
   }
 
   const navigation = [
@@ -63,7 +65,7 @@ export default function PatientDashboardLayout({ children }: PatientDashboardLay
     { name: "Lab Results", href: "/dashboard/lab-results", icon: FileText },
     { name: "Profile", href: "/dashboard/profile", icon: UserIcon },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
-  ]
+  ];
 
   return (
     <SidebarProvider>
@@ -83,7 +85,10 @@ export default function PatientDashboardLayout({ children }: PatientDashboardLay
           <SheetContent side="left" className="p-0 w-[75vw] max-w-75">
             <div className="flex h-full flex-col">
               <div className="p-3 sm:p-4 border-b">
-                <Link href="/" className="flex items-center gap-1 sm:gap-2 font-semibold text-sm sm:text-base">
+                <Link
+                  href="/"
+                  className="flex items-center gap-1 sm:gap-2 font-semibold text-sm sm:text-base"
+                >
                   Eazydoc Patient Portal
                 </Link>
               </div>
@@ -94,7 +99,9 @@ export default function PatientDashboardLayout({ children }: PatientDashboardLay
                       <Link
                         href={item.href}
                         className={`flex items-center gap-2 sm:gap-3 rounded-md px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium ${
-                          pathname === item.href ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                          pathname === item.href
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted"
                         }`}
                       >
                         <item.icon className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -105,8 +112,8 @@ export default function PatientDashboardLayout({ children }: PatientDashboardLay
                 </ul>
               </nav>
               <div className="p-3 sm:p-4 border-t">
-                <Button 
-                  variant="destructive" 
+                <Button
+                  variant="destructive"
                   className="w-full"
                   onClick={handleSignOut}
                 >
@@ -121,7 +128,10 @@ export default function PatientDashboardLayout({ children }: PatientDashboardLay
         {/* Desktop sidebar */}
         <Sidebar className="hidden md:flex">
           <SidebarHeader className="border-b p-3 sm:p-4">
-            <Link href="/" className="flex items-center gap-1 sm:gap-2 font-semibold text-sm sm:text-base">
+            <Link
+              href="/"
+              className="flex items-center gap-1 sm:gap-2 font-semibold text-sm sm:text-base"
+            >
               Eazydoc Patient Portal
             </Link>
           </SidebarHeader>
@@ -140,8 +150,8 @@ export default function PatientDashboardLayout({ children }: PatientDashboardLay
             </SidebarMenu>
           </SidebarContent>
           <div className="p-3 sm:p-4 border-t mt-auto">
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               className="w-full"
               onClick={handleSignOut}
             >
@@ -159,13 +169,22 @@ export default function PatientDashboardLayout({ children }: PatientDashboardLay
             </div>
             <div className="flex-1 flex justify-end">
               <div className="flex items-center gap-2 sm:gap-4">
-                <Button variant="ghost" size="icon" asChild className="h-8 w-8 sm:h-9 sm:w-9">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  asChild
+                  className="h-8 w-8 sm:h-9 sm:w-9"
+                >
                   <Link href="/">
                     <Home className="h-4 w-4 sm:h-5 sm:w-5" />
                     <span className="sr-only">Home</span>
                   </Link>
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-9 sm:w-9">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 sm:h-9 sm:w-9"
+                >
                   <span className="relative flex h-7 w-7 sm:h-9 sm:w-9 shrink-0 overflow-hidden rounded-full">
                     <InitialAvatar name="P" size={36} fontSize={16} />
                   </span>
@@ -177,5 +196,5 @@ export default function PatientDashboardLayout({ children }: PatientDashboardLay
         </div>
       </div>
     </SidebarProvider>
-  )
+  );
 }

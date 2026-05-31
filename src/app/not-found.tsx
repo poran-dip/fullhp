@@ -1,7 +1,6 @@
-import React from 'react';
-import Navbar from '@/components/navbar';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import Link from "next/link";
+import Navbar from "@/components/navbar";
+import { Button } from "@/components/ui/button";
 
 export default function NotFoundPage() {
   return (
@@ -14,22 +13,21 @@ export default function NotFoundPage() {
               404
             </h1>
 
-            <h2 className="text-3xl font-bold mb-4 relative z-20">Welcome, curious adventurer! Have a seat!</h2>
+            <h2 className="text-3xl font-bold mb-4 relative z-20">
+              Welcome, curious adventurer! Have a seat!
+            </h2>
 
             <p className="text-lg text-muted-foreground mb-6 relative z-20">
-              You wandered too far into the void and found the legendary 404 page. Few have made it here... Fewer have returned.
+              You wandered too far into the void and found the legendary 404
+              page. Few have made it here... Fewer have returned.
             </p>
 
             <div className="flex justify-center space-x-4 relative z-20">
               <Button asChild variant="outline">
-                <Link href="/">
-                  Back to Home
-                </Link>
+                <Link href="/">Back to Home</Link>
               </Button>
               <Button asChild>
-                <Link href="/features">
-                  Explore Features
-                </Link>
+                <Link href="/features">Explore Features</Link>
               </Button>
             </div>
           </div>

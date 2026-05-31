@@ -1,11 +1,11 @@
-import { Suspense } from "react"
-import DoctorSearch from "@/components/homepage/doctor-search"
-import FeaturedDoctors from "@/components/homepage/featured-doctors"
-import MedbotPromo from "@/components/homepage/medbot-promo"
-import Navbar from "@/components/navbar"
-import Disclaimer from "@/components/homepage/disclaimer"
-import { prisma } from "@/lib/prisma"
-import { Prisma } from "@/generated/client"
+import { Suspense } from "react";
+import Disclaimer from "@/components/homepage/disclaimer";
+import DoctorSearch from "@/components/homepage/doctor-search";
+import FeaturedDoctors from "@/components/homepage/featured-doctors";
+import MedbotPromo from "@/components/homepage/medbot-promo";
+import Navbar from "@/components/navbar";
+import { Prisma } from "@/generated/client";
+import { prisma } from "@/lib/prisma";
 
 // Define the Doctor interface at the top level
 interface Doctor {
@@ -26,7 +26,10 @@ interface Appointment {
 // Set revalidation time to 24 hours (in seconds)
 export const revalidate = 86400;
 
-async function fetchDoctors(): Promise<{ doctors: Doctor[], error: string | null }> {
+async function fetchDoctors(): Promise<{
+  doctors: Doctor[];
+  error: string | null;
+}> {
   try {
     const doctorsData = await prisma.doctor.findMany({
       select: {
@@ -41,27 +44,30 @@ async function fetchDoctors(): Promise<{ doctors: Doctor[], error: string | null
         appointments: {
           select: {
             id: true,
-            status: true
-          }
-        }
-      }
+            status: true,
+          },
+        },
+      },
     });
-    
+
     // Convert Decimal to number for each doctor
-    const doctors: Doctor[] = doctorsData.map(doctor => ({
+    const doctors: Doctor[] = doctorsData.map((doctor) => ({
       ...doctor,
-      rating: doctor.rating instanceof Prisma.Decimal ? doctor.rating.toDecimalPlaces(1).toNumber() : Number(doctor.rating)
+      rating:
+        doctor.rating instanceof Prisma.Decimal
+          ? doctor.rating.toDecimalPlaces(1).toNumber()
+          : Number(doctor.rating),
     }));
-    
+
     return {
       doctors,
-      error: null
+      error: null,
     };
   } catch (error) {
-    console.error('Error fetching doctors:', error);
+    console.error("Error fetching doctors:", error);
     return {
       doctors: [],
-      error: 'Failed to load doctors'
+      error: "Failed to load doctors",
     };
   }
 }
@@ -79,12 +85,18 @@ export default async function Home() {
         <section className="py-16 md:py-20 bg-blue-50">
           <div className="container px-4 md:px-6 max-w-6xl mx-auto">
             <div className="flex flex-col items-center space-y-4 text-center mb-12">
-              <h1 className="text-3xl md:text-5xl font-bold tracking-tighter">Find The Right Doctor For You</h1>
+              <h1 className="text-3xl md:text-5xl font-bold tracking-tighter">
+                Find The Right Doctor For You
+              </h1>
               <p className="mx-auto max-w-175 text-muted-foreground md:text-lg">
                 Search thousands of specialists and get the care you deserve.
               </p>
             </div>
-            <Suspense fallback={<div className="text-center">Loading doctor search...</div>}>
+            <Suspense
+              fallback={
+                <div className="text-center">Loading doctor search...</div>
+              }
+            >
               <DoctorSearch doctors={doctors} isLoading={false} error={error} />
             </Suspense>
           </div>
@@ -92,7 +104,11 @@ export default async function Home() {
 
         <MedbotPromo />
 
-        <Suspense fallback={<div className="text-center">Loading featured doctors...</div>}>
+        <Suspense
+          fallback={
+            <div className="text-center">Loading featured doctors...</div>
+          }
+        >
           <FeaturedDoctors doctors={doctors} isLoading={false} error={error} />
         </Suspense>
       </main>
@@ -103,11 +119,11 @@ export default async function Home() {
               © {new Date().getFullYear()} Cosmic Titans. All Rights Reserved.
             </p>
             <p className="text-center text-sm text-muted-foreground">
-              Eazydoc™ – A Project By Cosmic Titans. 
+              Eazydoc™ – A Project By Cosmic Titans.
             </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

@@ -1,18 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { z } from 'zod'
+import { type NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 
 // Patient Update Schema
 const PatientUpdateSchema = z.object({
   name: z.string().optional(),
   image: z.string().optional(),
   age: z.number().optional(),
-  gender: z.string().optional()
-})
+  gender: z.string().optional(),
+});
 
 export async function GET(
-  req: NextRequest, 
-  { params }: { params: Promise<{ id: string }> }
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -22,43 +22,53 @@ export async function GET(
         appointments: {
           include: {
             doctor: true,
-            ambulance: true
+            ambulance: true,
           },
           orderBy: {
-            dateTime: 'desc'
-          }
-        }
-      }
-    })
+            dateTime: "desc",
+          },
+        },
+      },
+    });
 
     if (!patient) {
-      return NextResponse.json({ 
-        error: 'Patient not found' 
-      }, { status: 404 })
+      return NextResponse.json(
+        {
+          error: "Patient not found",
+        },
+        { status: 404 },
+      );
     }
 
-    return NextResponse.json(patient)
+    return NextResponse.json(patient);
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'an unknown error occurred'
-    return NextResponse.json({ 
-      error: errorMessage 
-    }, { status: 500 })
+    const errorMessage =
+      error instanceof Error ? error.message : "an unknown error occurred";
+    return NextResponse.json(
+      {
+        error: errorMessage,
+      },
+      { status: 500 },
+    );
   }
 }
 
 export async function PUT(
-  req: NextRequest, 
-  { params }: { params: Promise<{ id: string }> }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
-    const body = await req.json()
+    const body = await req.json();
 
-    const validation = PatientUpdateSchema.safeParse(body)
+    const validation = PatientUpdateSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json({ 
-        error: validation.error.issues
-      }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: validation.error.issues,
+        },
+        { status: 400 },
+      );
     }
 
     const patient = await prisma.patient.update({
@@ -73,21 +83,25 @@ export async function PUT(
         image: true,
         // createdAt: true,
         // updatedAt: true
-      }
-    })
+      },
+    });
 
-    return NextResponse.json(patient)
+    return NextResponse.json(patient);
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'an unknown error occurred'
-    return NextResponse.json({ 
-      error: errorMessage 
-    }, { status: 500 })
+    const errorMessage =
+      error instanceof Error ? error.message : "an unknown error occurred";
+    return NextResponse.json(
+      {
+        error: errorMessage,
+      },
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
-  req: NextRequest, 
-  { params }: { params: Promise<{ id: string }> }
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -95,21 +109,25 @@ export async function DELETE(
     // Use transaction to ensure data consistency
     await prisma.$transaction(async (tx) => {
       await tx.appointment.deleteMany({
-        where: { patientId: id }
-      })
+        where: { patientId: id },
+      });
 
       await tx.patient.delete({
-        where: { id }
-      })
-    })
+        where: { id },
+      });
+    });
 
-    return NextResponse.json<{ message: string }>({ 
-      message: 'Patient and associated appointments deleted successfully' 
-    })
+    return NextResponse.json<{ message: string }>({
+      message: "Patient and associated appointments deleted successfully",
+    });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'an unknown error occurred'
-    return NextResponse.json({ 
-      error: errorMessage 
-    }, { status: 500 })
+    const errorMessage =
+      error instanceof Error ? error.message : "an unknown error occurred";
+    return NextResponse.json(
+      {
+        error: errorMessage,
+      },
+      { status: 500 },
+    );
   }
 }
