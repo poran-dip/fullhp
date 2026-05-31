@@ -1,10 +1,7 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
-import { PrismaClient } from "@/generated/client";
+import { PrismaClient } from "@/generated/prisma/client";
 
-// PrismaClient is attached to the `global` object in development to prevent
-// exhausting your database connection limit.
-// Learn more: https://pris.ly/d/help/next-js-best-practices
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
