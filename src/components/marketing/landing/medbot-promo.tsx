@@ -2,9 +2,9 @@ import { Bot, Check, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export default function MedbotPromo() {
+export default function MedbotPromoSection() {
   return (
-    <section className="py-12 md:py-16 bg-white">
+    <section id="medbot" className="py-16 md:py-20 bg-white">
       <div className="container px-4 md:px-6 max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row bg-white rounded-lg overflow-hidden border shadow-sm">
           <div className="bg-black text-white p-6 md:p-10 md:w-1/2">
