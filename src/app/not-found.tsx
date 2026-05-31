@@ -1,12 +1,13 @@
 import Link from "next/link";
-import Navbar from "@/components/navbar";
+import Footer from "@/components/marketing/footer";
+import Navbar from "@/components/marketing/navbar";
 import { Button } from "@/components/ui/button";
 
 export default function NotFoundPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 flex items-center justify-center bg-blue-50 px-4 py-16 relative">
+      <main className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-blue-50 px-4 py-16 relative">
         <div className="text-center max-w-xl mx-auto z-10 relative">
           <div className="relative mb-8">
             <h1 className="text-[25vh] md:text-[60vh] font-bold text-blue-500 opacity-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none -z-10 pointer-events-none">
@@ -33,6 +34,7 @@ export default function NotFoundPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
