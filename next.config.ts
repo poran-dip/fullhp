@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       new URL("https://ufgnkirvgeaijzudwbkg.supabase.co/**"),
       new URL("https://randomuser.me/**"),
+      new URL("https://api.dicebear.com/**"),
     ],
   },
 };
