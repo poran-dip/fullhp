@@ -6,10 +6,10 @@ export async function navigateByRole() {
   const role = session?.user?.role;
 
   const routes: Record<string, string> = {
-    patient: "/patient",
-    doctor: "/doctor",
-    admin: "/admin",
-    driver: "/driver",
+    Patient: "/patient",
+    Doctor: "/doctor",
+    Admin: "/admin",
+    Driver: "/driver",
   };
 
   redirect(routes[role ?? ""] ?? "/");
