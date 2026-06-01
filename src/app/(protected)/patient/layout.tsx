@@ -13,9 +13,5 @@ export default async function ProtectedLayout({
     await navigateByRole();
   }
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      {children}
-    </div>
-  );
+  return <div className="min-h-screen flex flex-col">{children}</div>;
 }
