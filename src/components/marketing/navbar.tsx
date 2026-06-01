@@ -6,7 +6,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -64,7 +70,9 @@ export default function Navbar() {
             </SheetTrigger>
             <SheetContent side="right" className="flex flex-col h-full px-2">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-              <SheetDescription className="sr-only">Navigate across the platform</SheetDescription>
+              <SheetDescription className="sr-only">
+                Navigate across the platform
+              </SheetDescription>
               <Link href="/" className="flex items-center gap-2 pt-4">
                 <Image
                   src="/logo.jpg"

@@ -2,6 +2,7 @@
 
 import { format } from "date-fns";
 import { Star } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -9,7 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
 
 const WEEKDAY_ORDER = [
   "Monday",
@@ -131,7 +131,10 @@ export default function DoctorProfileClient({ doctor, isLoggedIn }: Props) {
     <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
       <header>
         <div>
-          <Link href="/doctors" className="text-blue-600 font-medium hover:underline">
+          <Link
+            href="/doctors"
+            className="text-blue-600 font-medium hover:underline"
+          >
             &larr; View All Doctors
           </Link>
         </div>
@@ -167,8 +170,9 @@ export default function DoctorProfileClient({ doctor, isLoggedIn }: Props) {
               <div className="flex items-center gap-2">
                 <StarRow count={5} filled={Math.floor(doctor.avgRating ?? 0)} />
                 <span className="text-sm text-muted-foreground">
-                  {doctor.avgRating?.toFixed(1) ?? "—"}{" "}
-                  ({doctor.ratingCount ?? 0} review{doctor.ratingCount !== 1 ? "s" : ""})
+                  {doctor.avgRating?.toFixed(1) ?? "—"} (
+                  {doctor.ratingCount ?? 0} review
+                  {doctor.ratingCount !== 1 ? "s" : ""})
                 </span>
               </div>
               <p className="text-sm text-muted-foreground">
@@ -273,7 +277,10 @@ export default function DoctorProfileClient({ doctor, isLoggedIn }: Props) {
                               {rating.patient.user.name ?? "Anonymous"}
                             </p>
                             <span className="text-xs text-muted-foreground">
-                              {format(new Date(rating.createdAt), "MMM d, yyyy")}
+                              {format(
+                                new Date(rating.createdAt),
+                                "MMM d, yyyy",
+                              )}
                             </span>
                           </div>
                           <StarRow count={5} filled={rating.stars} />

@@ -6,7 +6,10 @@ export default function TermsOfService() {
       <div className="max-w-3xl mx-auto px-4 pt-12 pb-20">
         <header className="mb-10">
           <div className="flex justify-end">
-            <Link href="/privacy" className="text-blue-600 font-medium hover:underline">
+            <Link
+              href="/privacy"
+              className="text-blue-600 font-medium hover:underline"
+            >
               Privacy Policy &rarr;
             </Link>
           </div>
@@ -134,10 +137,10 @@ export default function TermsOfService() {
             <p>
               We collect only the data necessary to operate and secure the
               Platform. This includes account information you provide at
-              registration, authentication session data, and activity
-              directly related to your use of Platform features. We do not
-              collect data beyond what is required for the Platform to function,
-              and we do not sell your data to third parties.
+              registration, authentication session data, and activity directly
+              related to your use of Platform features. We do not collect data
+              beyond what is required for the Platform to function, and we do
+              not sell your data to third parties.
             </p>
             <p>
               For further information, please refer to our{" "}

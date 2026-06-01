@@ -33,7 +33,7 @@ const statusConfig = {
     label: "Inactive",
     className: "bg-red-50 text-red-700 border-red-200",
   },
-} as const satisfies Record<string, { label: string; className: string }>;;
+} as const satisfies Record<string, { label: string; className: string }>;
 
 interface DoctorsListProps {
   doctors: DoctorWithUser[];
@@ -201,7 +201,8 @@ export default function DoctorsList({ doctors, error }: DoctorsListProps) {
                         />
                       ))}
                     <span className="text-xs text-muted-foreground ml-1">
-                      {doctor.avgRating?.toFixed(1) ?? "—"} · {doctor.appointments.length} appointments
+                      {doctor.avgRating?.toFixed(1) ?? "—"} ·{" "}
+                      {doctor.appointments.length} appointments
                     </span>
                   </div>
                 </div>

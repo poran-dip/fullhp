@@ -54,16 +54,17 @@ export default function AboutPage() {
     <main className="flex-1 container mx-auto px-4 pt-12 pb-20 max-w-4xl">
       {/* Origin Story */}
       <section className="mb-16">
-        <h1 className="text-2xl md:text-4xl font-bold text-center mb-10">Our Story</h1>
+        <h1 className="text-2xl md:text-4xl font-bold text-center mb-10">
+          Our Story
+        </h1>
         <div className="max-w-2xl mx-auto space-y-5 text-muted-foreground leading-relaxed">
           <p>
             FullHP didn&apos;t start with a grand plan — it started with
-            Dikshayn convincing{" "}
-            <span className="italic">(read: nagging)</span> me to join yet
-            another hackathon. Once we were in, we teamed up with Rajdeep and
-            Hirok to build something real: a healthcare platform that connects
-            patients, doctors, and hospitals, making medical access simpler than
-            it has any right to be.
+            Dikshayn convincing <span className="italic">(read: nagging)</span>{" "}
+            me to join yet another hackathon. Once we were in, we teamed up with
+            Rajdeep and Hirok to build something real: a healthcare platform
+            that connects patients, doctors, and hospitals, making medical
+            access simpler than it has any right to be.
           </p>
           <p>
             With Dikshayn leading the AI-powered medbot and me handling the
@@ -88,7 +89,9 @@ export default function AboutPage() {
 
       {/* Current Team */}
       <section className="mb-12">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">The Team</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+          The Team
+        </h2>
         <div className="grid sm:grid-cols-2 gap-6">
           {currentTeam.map((member) => (
             <Card
@@ -179,7 +182,9 @@ export default function AboutPage() {
 
       {/* Tech Stack */}
       <section className="mb-12">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Built With</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+          Built With
+        </h2>
         <div className="flex flex-wrap justify-center gap-3">
           {techStack.map((tech) => (
             <Link

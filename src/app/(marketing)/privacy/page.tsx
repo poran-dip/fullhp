@@ -6,7 +6,10 @@ export default function PrivacyPolicy() {
       <div className="max-w-3xl mx-auto px-4 pt-12 pb-20">
         <header className="mb-10">
           <div className="flex justify-end">
-            <Link href="/terms" className="text-blue-600 font-medium hover:underline">
+            <Link
+              href="/terms"
+              className="text-blue-600 font-medium hover:underline"
+            >
               Terms of Service &rarr;
             </Link>
           </div>
@@ -18,10 +21,10 @@ export default function PrivacyPolicy() {
 
         <div className="prose prose-slate max-w-none">
           <p>
-            This Privacy Policy describes how FullHP, developed by Cosmic
-            Titans ("we," "us," or "our"), collects, uses, and protects the
-            information you ("you" or "User") provide when using our platform
-            ("the Platform").
+            This Privacy Policy describes how FullHP, developed by Cosmic Titans
+            ("we," "us," or "our"), collects, uses, and protects the information
+            you ("you" or "User") provide when using our platform ("the
+            Platform").
           </p>
 
           <hr className="my-8" />
@@ -49,8 +52,8 @@ export default function PrivacyPolicy() {
               </li>
             </ul>
             <p>
-              We do not collect data beyond what is required for the Platform
-              to function.
+              We do not collect data beyond what is required for the Platform to
+              function.
             </p>
           </section>
 
@@ -68,8 +71,8 @@ export default function PrivacyPolicy() {
               <li>Maintain the security and integrity of the Platform.</li>
             </ul>
             <p>
-              We do not use your data for marketing, third-party advertising,
-              or analytics beyond what is necessary to operate the Platform.
+              We do not use your data for marketing, third-party advertising, or
+              analytics beyond what is necessary to operate the Platform.
             </p>
           </section>
 
@@ -107,17 +110,16 @@ export default function PrivacyPolicy() {
               4. Data Security
             </h2>
             <p>
-              We implement reasonable technical safeguards to protect your
-              data. These include bcrypt password hashing, secure JWT-based
-              session management, and role-based access control (RBAC) across
-              all API endpoints. Your information is not accessible to other
-              users outside of the explicitly permitted relationships described
-              above.
+              We implement reasonable technical safeguards to protect your data.
+              These include bcrypt password hashing, secure JWT-based session
+              management, and role-based access control (RBAC) across all API
+              endpoints. Your information is not accessible to other users
+              outside of the explicitly permitted relationships described above.
             </p>
             <p>
-              While we take security seriously, no system can guarantee
-              absolute security. You acknowledge that you submit information at
-              your own risk.
+              While we take security seriously, no system can guarantee absolute
+              security. You acknowledge that you submit information at your own
+              risk.
             </p>
           </section>
 
@@ -161,8 +163,8 @@ export default function PrivacyPolicy() {
             <p>
               You are responsible for the accuracy and appropriateness of the
               information you submit to the Platform. Please ensure that any
-              health or personal information you provide is accurate and kept
-              up to date.
+              health or personal information you provide is accurate and kept up
+              to date.
             </p>
           </section>
 
