@@ -9,9 +9,11 @@ export async function getDoctors() {
         department: true,
         status: true,
         avgRating: true,
+        phoneNo: true,
         user: {
           select: {
             name: true,
+            email: true,
             image: true,
           },
         },
@@ -21,8 +23,13 @@ export async function getDoctors() {
             status: true,
           },
         },
+        _count: {
+          select: { appointments: true },
+        },
       },
+      orderBy: { createdAt: "desc" },
     });
+
     return { doctors, error: null };
   } catch (error) {
     console.error("Error fetching doctors:", error);
