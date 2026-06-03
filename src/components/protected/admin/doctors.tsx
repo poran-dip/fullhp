@@ -4,10 +4,10 @@ import { Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
-import Cropper from "react-easy-crop";
+import { useState } from "react";
 import { toast } from "sonner";
 
+import { ImageCropper } from "@/components/image-cropper";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,146 +69,6 @@ const emptyForm = {
   phoneNo: "",
   image: "",
 };
-
-// Crop helpers
-async function getCroppedBlob(
-  imageSrc: string,
-  croppedAreaPixels: { x: number; y: number; width: number; height: number },
-): Promise<Blob> {
-  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = new window.Image();
-    img.addEventListener("load", () => resolve(img));
-    img.addEventListener("error", reject);
-    img.src = imageSrc;
-  });
-
-  const canvas = document.createElement("canvas");
-  canvas.width = croppedAreaPixels.width;
-  canvas.height = croppedAreaPixels.height;
-  // biome-ignore lint: canvas exists
-  const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(
-    image,
-    croppedAreaPixels.x,
-    croppedAreaPixels.y,
-    croppedAreaPixels.width,
-    croppedAreaPixels.height,
-    0,
-    0,
-    croppedAreaPixels.width,
-    croppedAreaPixels.height,
-  );
-
-  return new Promise((resolve, reject) =>
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject()), "image/jpeg"),
-  );
-}
-
-function ImageCropper({
-  onDone,
-  onCancel,
-}: {
-  onDone: (url: string) => void;
-  onCancel: () => void;
-}) {
-  const [src, setSrc] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<{
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  } | null>(null);
-  const [uploading, setUploading] = useState(false);
-
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setSrc(reader.result as string);
-    reader.readAsDataURL(file);
-  };
-
-  const onCropComplete = useCallback(
-    (
-      _: unknown,
-      pixels: { x: number; y: number; width: number; height: number },
-    ) => {
-      setCroppedAreaPixels(pixels);
-    },
-    [],
-  );
-
-  const handleUpload = async () => {
-    if (!src || !croppedAreaPixels) return;
-    setUploading(true);
-    try {
-      const blob = await getCroppedBlob(src, croppedAreaPixels);
-      const formData = new FormData();
-      formData.append("file", blob, "avatar.jpg");
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      if (!res.ok) throw new Error();
-      const { url } = await res.json();
-      onDone(url);
-    } catch {
-      toast.error("Failed to upload image");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  if (!src) {
-    return (
-      <div className="space-y-2">
-        <Input type="file" accept="image/*" onChange={onFileChange} />
-        <Button variant="secondary" size="sm" onClick={onCancel}>
-          Cancel
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      <div className="relative w-full h-56 bg-black rounded overflow-hidden">
-        <Cropper
-          image={src}
-          crop={crop}
-          zoom={zoom}
-          aspect={1}
-          onCropChange={setCrop}
-          onZoomChange={setZoom}
-          onCropComplete={onCropComplete}
-        />
-      </div>
-      <input
-        type="range"
-        min={1}
-        max={3}
-        step={0.01}
-        value={zoom}
-        onChange={(e) => setZoom(Number(e.target.value))}
-        className="w-full"
-      />
-      <div className="flex gap-2">
-        <Button variant="secondary" size="sm" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button size="sm" onClick={handleUpload} disabled={uploading}>
-          {uploading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            "Use Photo"
-          )}
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 const PER_PAGE = 50;
 
