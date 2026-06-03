@@ -21,10 +21,10 @@ export default function Navbar() {
   const navLinks = (
     <>
       <Link
-        href="/#features"
+        href="/doctors"
         className="text-sm font-medium hover:text-primary transition-colors"
       >
-        Features
+        Doctors
       </Link>
       <Link
         href="/about"
@@ -85,10 +85,10 @@ export default function Navbar() {
               </Link>
               <nav className="flex flex-col gap-1 mt-4">
                 <Link
-                  href="/#features"
+                  href="/doctors"
                   className="py-3 px-2 text-sm font-medium hover:bg-gray-50 rounded transition-colors border-t border-gray-100"
                 >
-                  Features
+                  Doctors
                 </Link>
                 <Link
                   href="/about"

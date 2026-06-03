@@ -6,7 +6,7 @@ import { auth } from "@/lib/auth";
 const footerLinks = {
   Platform: [
     { label: "Home", href: "/" },
-    { label: "Features", href: "/#features" },
+    { label: "Doctors", href: "/doctors" },
     { label: "About", href: "/about" },
   ],
   Legal: [
