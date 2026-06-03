@@ -1,6 +1,5 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  Activity,
   Beaker,
   Calendar,
   CalendarPlus,
@@ -45,7 +44,6 @@ const navByRole: Record<string, NavItem[]> = {
   [Role.Doctor]: [
     { name: "Home", href: "/doctor", icon: Home },
     { name: "Appointments", href: "/doctor/appointments", icon: Calendar },
-    { name: "Status", href: "/doctor/status", icon: Activity },
     { name: "Settings", href: "/doctor/settings", icon: Settings },
   ],
   [Role.Admin]: [
