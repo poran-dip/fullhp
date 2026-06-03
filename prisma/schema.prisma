@@ -1,89 +1,271 @@
 generator client {
   provider = "prisma-client"
-  output     = "../src/generated"
-  engineType = "client"
-  moduleFormat = "cjs"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-enum AppointmentStatus {
-  NEW
-  PENDING
-  COMPLETED
-  CANCELED
-  EMERGENCY
+enum Role {
+  Patient
+  Doctor
+  Driver
+  Admin
 }
 
-enum Status {
-  AVAILABLE
-  ON_DUTY
-  OFF_DUTY
-  UNAVAILABLE
+enum Weekday {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
+enum DoctorStatus {
+  Active
+  Inactive
+  OnLeave
+}
+
+enum DriverStatus {
+  Available
+  OnDuty
+  Unavailable
+}
+
+enum AppointmentStatus {
+  Requested
+  DoctorAssigned
+  Completed
+  Cancelled
+  Emergency
+}
+
+model User {
+  id            String    @id @default(cuid(2))
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  password      String?
+  image         String?
+  role          Role      @default(Patient)
+  patient       Patient?
+  doctor        Doctor?
+  driver        Driver?
+  admin         Admin?
+  accounts      Account[]
+  sessions      Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid(2))
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid(2))
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
 model Patient {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  password     String
-  name         String?
-  image        String?
-  age          Int?
-  gender       String?
+  id           String        @id @default(cuid(2))
+  userId       String        @unique @map("user_id")
+  user         User          @relation(fields: [userId], references: [id])
+  dob          DateTime      @map("dob")
+  gender       String
+  phoneNo      String        @unique @map("phone_no")
   appointments Appointment[]
+  ratings      Rating[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@map("patients")
+}
+
+model Schedule {
+  id       String @id @default(cuid(2))
+  doctorId String @unique @map("doctor_id")
+  days     Day[]
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
+  @@map("schedules")
+}
+
+model Day {
+  id         String   @id @default(cuid(2))
+  day        Weekday
+  startTime  String   @map("start_time")
+  endTime    String   @map("end_time")
+  scheduleId String   @map("schedule_id")
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+
+  @@unique([scheduleId, day])
+  @@index([scheduleId])
+  @@map("days")
 }
 
 model Doctor {
-  id             String         @id @default(cuid())
-  email          String         @unique
-  password       String
-  name           String?
-  image          String?
+  id             String        @id @default(cuid(2))
+  userId         String        @unique @map("user_id")
+  user           User          @relation(fields: [userId], references: [id])
+  phoneNo        String        @unique @map("phone_no")
   specialization String
-  location       String?
-  status         Status         @default(AVAILABLE)
+  department     String
+  schedule       Schedule?
+  status         DoctorStatus
   appointments   Appointment[]
-  rating         Decimal        @default(0.0)
+  ratings        Rating[]
+  avgRating      Float?        @map("avg_rating")
+  ratingCount    Int?          @map("rating_count")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@index([department])
+  @@index([status])
+  @@index([department, status])
+  @@map("doctors")
 }
 
-model Ambulance {
-  id           String           @id @default(cuid())
-  email        String           @unique
-  password     String
-  name         String?
-  image        String?
-  status       Status           @default(AVAILABLE)
+model Driver {
+  id           String        @id @default(cuid(2))
+  userId       String        @unique @map("user_id")
+  user         User          @relation(fields: [userId], references: [id])
+  lat          Float?
+  lon          Float?
+  status       DriverStatus
   appointments Appointment[]
-  rating       Decimal          @default(0.0)
+  ratings      Rating[]
+  avgRating    Float?        @map("avg_rating")
+  ratingCount  Int?          @map("rating_count")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@map("drivers")
 }
 
 model Admin {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  password     String
-  name         String?
+  id        String   @id @default(cuid(2))
+  userId    String   @unique @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+model Prescription {
+  id            String      @id @default(cuid(2))
+  appointmentId String      @map("appointment_id")
+  medicine      String
+  dosage        String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  @@index([appointmentId])
+  @@map("prescriptions")
+}
+
+model Test {
+  id            String      @id @default(cuid(2))
+  appointmentId String      @map("appointment_id")
+  test          String
+  result        String?
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  @@index([appointmentId])
+  @@map("tests")
 }
 
 model Appointment {
-  id                  String             @id @default(cuid())
-  patient             Patient            @relation(fields: [patientId], references: [id])
-  patientId           String
-  doctor              Doctor?            @relation(fields: [doctorId], references: [id])
-  doctorId            String?
-  ambulance           Ambulance?         @relation(fields: [ambulanceId], references: [id])
-  ambulanceId         String?
-  
-  dateTime            DateTime?
-  condition           String?
-  specialization      String?
-  status              AppointmentStatus  @default(NEW)
-  comments            String?
-  description         String?
-  prescriptions       String[]
-  tests               String[]
-  
-  relatedAppointments Appointment[]      @relation("RelatedAppointments")
-  relatedTo           Appointment[]      @relation("RelatedAppointments")
+  id             String            @id @default(cuid(2))
+  patientId      String            @map("patient_id")
+  doctorId       String?           @map("doctor_id")
+  driverId       String?           @map("driver_id")
+  time           DateTime
+  status         AppointmentStatus
+  department     String?
+  condition      String?
+  doctorComments String?           @map("doctor_comments")
+  prescriptions  Prescription[]
+  tests          Test[]
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+
+  patient             Patient               @relation(fields: [patientId], references: [id])
+  doctor              Doctor?               @relation(fields: [doctorId], references: [id])
+  driver              Driver?               @relation(fields: [driverId], references: [id])
+  relatedAppointments AppointmentRelation[] @relation("AppointmentFrom")
+  relatedTo           AppointmentRelation[] @relation("AppointmentTo")
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([driverId])
+  @@index([status])
+  @@index([doctorId, status])
+  @@map("appointments")
+}
+
+model AppointmentRelation {
+  appointmentId        String      @map("appointment_id")
+  relatedAppointmentId String      @map("related_appointment_id")
+  appointment          Appointment @relation("AppointmentFrom", fields: [appointmentId], references: [id])
+  relatedAppointment   Appointment @relation("AppointmentTo", fields: [relatedAppointmentId], references: [id])
+
+  @@id([appointmentId, relatedAppointmentId])
+  @@index([relatedAppointmentId])
+  @@map("appointment_relations")
+}
+
+model Rating {
+  id        String   @id @default(cuid(2))
+  stars     Int
+  comment   String?
+  patientId String   @map("patient_id")
+  doctorId  String?  @map("doctor_id")
+  driverId  String?  @map("driver_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  doctor  Doctor? @relation(fields: [doctorId], references: [id])
+  driver  Driver? @relation(fields: [driverId], references: [id])
+
+  @@unique([patientId, doctorId])
+  @@unique([patientId, driverId])
+  @@index([doctorId])
+  @@index([driverId])
+  @@index([patientId])
+  @@map("ratings")
 }

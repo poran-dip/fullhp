@@ -1,6 +1,6 @@
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { getMedbotModel } from "@/lib/gemini";
-import { headers } from "next/headers";
 
 // Define chat session interface with session tracking
 interface ChatSession {
@@ -13,7 +13,7 @@ interface ChatSession {
 let chatSession: ChatSession = {
   instance: null,
   hasInitialContext: false,
-  sessionId: ''
+  sessionId: "",
 };
 
 // Constant guidelines that will be sent once
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
   try {
     const { message, isFirstMessage } = await req.json();
     const headersList = await headers();
-    const currentSessionId = headersList.get('x-session-id') || '';
+    const currentSessionId = headersList.get("x-session-id") || "";
     const model = getMedbotModel();
 
     // Reset session if ID changed or doesn't match
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
       chatSession = {
         instance: null,
         hasInitialContext: false,
-        sessionId: currentSessionId
+        sessionId: currentSessionId,
       };
     }
 
@@ -89,69 +89,79 @@ export async function POST(req: Request) {
 
     // Send user message and get response
     const result = await chatSession.instance.sendMessage(message);
-    
+
     if (!result?.response) {
       throw new Error("Failed to generate response");
     }
 
     const text = result.response.text();
-    
+
     if (!text) {
       throw new Error("Empty response from model");
     }
 
     const structuredResponse = parseInteractiveResponse(text);
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       response: structuredResponse,
       timestamp: new Date().toISOString(),
       sessionId: chatSession.sessionId,
-      hasInitialContext: chatSession.hasInitialContext
+      hasInitialContext: chatSession.hasInitialContext,
     });
-
   } catch (error) {
     console.error("MedBot error:", error);
     // Reset chat session completely on error
     chatSession = {
       instance: null,
       hasInitialContext: false,
-      sessionId: ''
+      sessionId: "",
     };
-    
-    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
-    
+
+    const errorMessage =
+      error instanceof Error ? error.message : "An unexpected error occurred";
+
     return NextResponse.json(
-      { 
+      {
         error: errorMessage,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 function parseInteractiveResponse(response: string) {
-  const sections = response.split('##').filter(section => section.trim());
-  
+  const sections = response.split("##").filter((section) => section.trim());
+
   const parseSection = (title: string): string => {
-    const section = sections.find(s => s.trim().startsWith(title));
-    return section
-      ?.replace(title, '')
-      ?.trim() || '';
+    const section = sections.find((s) => s.trim().startsWith(title));
+    return section?.replace(title, "")?.trim() || "";
   };
 
-  const analysisSection = parseSection('Analysis');
-  const analysisLines = analysisSection.split('\n');
+  const analysisSection = parseSection("Analysis");
+  const analysisLines = analysisSection.split("\n");
   const analysis = {
-    symptomAnalysis: analysisLines.find(line => line.includes('Symptom Analysis:'))?.split(':')[1]?.trim() || '',
-    specialistType: analysisLines.find(line => line.includes('Specialist Type:'))?.split(':')[1]?.trim() || '',
-    urgencyLevel: analysisLines.find(line => line.includes('Urgency Level:'))?.split(':')[1]?.trim() || ''
+    symptomAnalysis:
+      analysisLines
+        .find((line) => line.includes("Symptom Analysis:"))
+        ?.split(":")[1]
+        ?.trim() || "",
+    specialistType:
+      analysisLines
+        .find((line) => line.includes("Specialist Type:"))
+        ?.split(":")[1]
+        ?.trim() || "",
+    urgencyLevel:
+      analysisLines
+        .find((line) => line.includes("Urgency Level:"))
+        ?.split(":")[1]
+        ?.trim() || "",
   };
 
   return {
-    response: parseSection('Response'),
-    followUpQuestion: parseSection('Follow-up Question'),
+    response: parseSection("Response"),
+    followUpQuestion: parseSection("Follow-up Question"),
     analysis,
-    context: parseSection('Context')
+    context: parseSection("Context"),
   };
 }

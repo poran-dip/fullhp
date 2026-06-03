@@ -1,128 +1,197 @@
-import { PrismaClient } from '@/generated/client'
-import { PrismaPg } from '@prisma/adapter-pg'
-import { Pool } from 'pg'
-import bcrypt from 'bcryptjs'
+import { PrismaPg } from "@prisma/adapter-pg";
+import bcrypt from "bcryptjs";
+import { Pool } from "pg";
+import {
+  DoctorStatus,
+  DriverStatus,
+  PrismaClient,
+  Role,
+} from "@/generated/prisma/client";
 
-const connectionString = process.env.DATABASE_URL!
-const pool = new Pool({ connectionString })
-const adapter = new PrismaPg(pool)
+const connectionString = process.env.DATABASE_URL;
 
-const prisma = new PrismaClient({ adapter })
+if (!connectionString) {
+  throw new Error("Missing DATABASE_URL");
+}
+
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  await prisma.admin.create({
-    data: {
-      email: 'porandip@gmail.com',
-      password: await bcrypt.hash('Password@1', 10),
-      name: 'Poran Dip'
-    }
-  })
+  await prisma.$transaction([
+    prisma.user.create({
+      data: {
+        name: "Poran",
+        email: "poran@example.com",
+        emailVerified: new Date(),
+        password: await bcrypt.hash("admin", 10),
+        role: Role.Admin,
+        admin: {
+          create: {},
+        },
+      },
+    }),
+    prisma.user.create({
+      data: {
+        name: "Dikshyan",
+        email: "dikshyan@example.com",
+        emailVerified: new Date(),
+        password: await bcrypt.hash("patient123", 10),
+        role: Role.Patient,
+        patient: {
+          create: {
+            dob: new Date("2003-1-1"),
+            gender: "Male",
+            phoneNo: "123",
+          },
+        },
+      },
+    }),
+    prisma.user.create({
+      data: {
+        name: "Rajdeep",
+        email: "rajdeep@example.com",
+        password: await bcrypt.hash("patient456", 10),
+        role: Role.Patient,
+        patient: {
+          create: {
+            dob: new Date("2004-1-1"),
+            gender: "Male",
+            phoneNo: "456",
+          },
+        },
+      },
+    }),
+    prisma.user.create({
+      data: {
+        name: "Pooja",
+        email: "pooja@example.com",
+        emailVerified: new Date(),
+        password: await bcrypt.hash("patient789", 10),
+        role: Role.Patient,
+        patient: {
+          create: {
+            dob: new Date("2005-1-1"),
+            gender: "Female",
+            phoneNo: "789",
+          },
+        },
+      },
+    }),
+    prisma.user.create({
+      data: {
+        name: "Dr. Sosangkar",
+        email: "sosangkar@example.com",
+        emailVerified: new Date(),
+        password: await bcrypt.hash("doctor0", 10),
+        role: Role.Doctor,
+        image: "https://randomuser.me/api/portraits/men/3.jpg",
+        doctor: {
+          create: {
+            phoneNo: "000",
+            department: "Neurology",
+            specialization: "Cognitive & Behavioral Neurology",
+            status: DoctorStatus.Active,
+          },
+        },
+      },
+    }),
+    prisma.user.create({
+      data: {
+        name: "Dr. Kristina",
+        email: "kristina@example.com",
+        emailVerified: new Date(),
+        password: await bcrypt.hash("doctor1", 10),
+        role: Role.Doctor,
+        image: "https://randomuser.me/api/portraits/women/3.jpg",
+        doctor: {
+          create: {
+            phoneNo: "111",
+            department: "Psychiatry",
+            specialization: "Child & Adolescent Psychiatry",
+            status: DoctorStatus.OnLeave,
+          },
+        },
+      },
+    }),
+    prisma.user.create({
+      data: {
+        name: "Dr. Kundil",
+        email: "kundil@example.com",
+        emailVerified: new Date(),
+        password: await bcrypt.hash("doctor2", 10),
+        role: Role.Doctor,
+        image: "https://randomuser.me/api/portraits/men/9.jpg",
+        doctor: {
+          create: {
+            phoneNo: "222",
+            department: "Pediatrics",
+            specialization: "Developmental-Behavioral Pediatrics",
+            status: DoctorStatus.Active,
+          },
+        },
+      },
+    }),
+    prisma.user.create({
+      data: {
+        name: "Dr. Anu",
+        email: "anu@example.com",
+        emailVerified: new Date(),
+        password: await bcrypt.hash("doctor9", 10),
+        role: Role.Doctor,
+        image: "https://randomuser.me/api/portraits/women/4.jpg",
+        doctor: {
+          create: {
+            phoneNo: "999",
+            department: "Neurology",
+            specialization: "Epilepsy (Epileptology)",
+            status: DoctorStatus.Inactive,
+          },
+        },
+      },
+    }),
+    prisma.user.create({
+      data: {
+        name: "Dishita",
+        email: "dishita@example.com",
+        emailVerified: new Date(),
+        password: await bcrypt.hash("driver11", 10),
+        role: Role.Driver,
+        image: "https://randomuser.me/api/portraits/women/6.jpg",
+        driver: {
+          create: {
+            status: DriverStatus.Available,
+          },
+        },
+      },
+    }),
+    prisma.user.create({
+      data: {
+        name: "Ruhan",
+        email: "ruhan@example.com",
+        emailVerified: new Date(),
+        password: await bcrypt.hash("driver99", 10),
+        role: Role.Driver,
+        image: "https://randomuser.me/api/portraits/men/6.jpg",
+        driver: {
+          create: {
+            status: DriverStatus.Available,
+          },
+        },
+      },
+    }),
+  ]);
 
-  await prisma.patient.createMany({
-    data: [
-      {
-        email: 'dikshayn@gmail.com',
-        password: await bcrypt.hash('dikku', 10),
-        name: 'Dikshayn Chakroborty',
-        age: 22,
-        gender: 'Male',
-        image: 'https://randomuser.me/api/portraits/men/1.jpg'
-      },
-      {
-        email: 'rajdeep@gmail.com',
-        password: await bcrypt.hash('rajdeep', 10),
-        name: 'Rajdeep Choudhary',
-        age: 21,
-        gender: 'Male',
-        image: 'https://randomuser.me/api/portraits/men/2.jpg'
-      },
-      {
-        email: 'pooja@gmail.com',
-        password: await bcrypt.hash('pooja', 10),
-        name: 'Pooja Basumatary',
-        age: 18,
-        gender: 'Female',
-        image: 'https://randomuser.me/api/portraits/women/2.jpg'
-      }
-    ]
-  })
-
-  await prisma.doctor.createMany({
-    data: [
-      {
-        email: 'sosangkar@gmail.com',
-        password: await bcrypt.hash('sosangkar', 10),
-        name: 'Dr. Sosangkar Saikia',
-        specialization: 'Neurology',
-        status: 'AVAILABLE',
-        image: 'https://randomuser.me/api/portraits/men/3.jpg',
-        location: 'Guwahati, AS',
-        rating: 4.95
-      },
-      {
-        email: 'kristina@gmail.com',
-        password: await bcrypt.hash('kristina', 10),
-        name: 'Dr. Kristina Deka',
-        specialization: 'Psychiatry',
-        status: 'UNAVAILABLE',
-        image: 'https://randomuser.me/api/portraits/women/3.jpg',
-        location: 'Nalbari, AS',
-        rating: 4.48
-      },
-      {
-        email: 'kabyashree@gmail.com',
-        password: await bcrypt.hash('kabyashree', 10),
-        name: 'Dr. Kabyashree Hazarika',
-        specialization: 'Pediatrics',
-        status: 'AVAILABLE',
-        image: 'https://randomuser.me/api/portraits/women/4.jpg',
-        location: 'Kolkata, WB',
-        rating: 4.99
-      },
-      {
-        email: 'john@gmail.com',
-        password: await bcrypt.hash('kabyashree', 10),
-        name: 'Dr. John Kalita',
-        specialization: 'Neurology',
-        status: 'AVAILABLE',
-        image: 'https://randomuser.me/api/portraits/men/9.jpg',
-        location: 'Kolkata, WB',
-        rating: 4.99
-      }
-    ]
-  })
-
-  await prisma.ambulance.createMany({
-    data: [
-      {
-        email: 'dishita@gmail.com',
-        password: await bcrypt.hash('dishita', 10),
-        name: 'Dishita Deka',
-        status: 'AVAILABLE',
-        image: 'https://randomuser.me/api/portraits/women/6.jpg',
-        rating: 4.72
-      },
-      {
-        email: 'ruhan@gmail.com',
-        password: await bcrypt.hash('ruhan', 10),
-        name: 'Md Ruhan Roushan Islam',
-        status: 'ON_DUTY',
-        image: 'https://randomuser.me/api/portraits/men/6.jpg',
-        rating: 4.15
-      }
-    ]
-  })
-
-  console.log('Seeding completed successfully!')
+  console.log("Seeding completed successfully!");
 }
 
 main()
   .catch((e) => {
-    console.error(e)
-    process.exit(1)
+    console.error(e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
-
-export {}
+    await prisma.$disconnect();
+  });
