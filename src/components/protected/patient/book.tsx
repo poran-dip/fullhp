@@ -267,7 +267,7 @@ export default function BookAppointment({
 
   if (error) {
     return (
-      <div className="max-w-xl mx-auto py-10">
+      <div>
         <Card>
           <CardContent className="p-6 text-center">
             <p className="text-destructive text-sm">{error}</p>
@@ -278,7 +278,7 @@ export default function BookAppointment({
   }
 
   return (
-    <div className="max-w-xl mx-auto py-10 space-y-6">
+    <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Book Appointment</h1>
         <p className="text-muted-foreground">
