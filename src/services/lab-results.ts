@@ -18,12 +18,12 @@ export interface AppointmentWithTests {
 }
 
 export async function getPatientLabResults() {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { appointments: [], error: "Unauthorized" };
-    }
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { appointments: [], error: "Unauthorized" };
+  }
 
+  try {
     const patient = await prisma.patient.findUnique({
       where: { userId: session.user.id },
       select: {

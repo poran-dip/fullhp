@@ -15,12 +15,12 @@ export interface PatientProfile {
 }
 
 export async function getPatientProfile() {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { profile: null, error: "Unauthorized" };
-    }
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { profile: null, error: "Unauthorized" };
+  }
 
+  try {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: {

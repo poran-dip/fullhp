@@ -26,12 +26,12 @@ export async function getDoctorProfile(): Promise<{
   data: DoctorProfile | null;
   error: string | null;
 }> {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { data: null, error: "Unauthorized" };
-    }
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { data: null, error: "Unauthorized" };
+  }
 
+  try {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: {

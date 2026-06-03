@@ -2,12 +2,12 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function getDoctorDashboardData() {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { data: null, error: "Unauthorized" };
-    }
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { data: null, error: "Unauthorized" };
+  }
 
+  try {
     const doctor = await prisma.doctor.findUnique({
       where: { userId: session.user.id },
       select: {

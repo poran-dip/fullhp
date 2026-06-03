@@ -9,12 +9,12 @@ export interface BookingDoctor {
 }
 
 export async function getBookingData(doctorId?: string) {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return { doctors: [], preselectedDoctor: null, error: "Unauthorized" };
-    }
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { doctors: [], preselectedDoctor: null, error: "Unauthorized" };
+  }
 
+  try {
     const doctors = await prisma.doctor.findMany({
       where: { status: "Active" },
       select: {
