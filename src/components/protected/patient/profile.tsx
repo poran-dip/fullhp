@@ -185,7 +185,11 @@ function DobCalendar({
           month={viewDate}
           onMonthChange={setViewDate}
           disabled={(d) => d > new Date()}
-          className="border-none p-0"
+          className="border-none p-0 w-full"
+          classNames={{
+            month_caption: "hidden",
+            nav: "hidden",
+          }}
         />
       )}
     </div>
