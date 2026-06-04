@@ -141,7 +141,7 @@ function RatingDialog({
     setSubmitting(true);
     try {
       const res = await fetch("/api/ratings", {
-        method: isEdit ? "PUT" : "POST",
+        method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ doctorId, appointmentId, stars, comment }),
       });

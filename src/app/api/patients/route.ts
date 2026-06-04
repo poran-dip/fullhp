@@ -1,28 +1,30 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/prisma";
 
-const registerSchema = z.object({
+const schema = z.object({
   name: z.string().min(1),
   email: z.email(),
-  password: z.string().min(4),
-  phoneNo: z.string().min(1),
-  dob: z.string().min(1),
   gender: z.string().min(1),
+  dob: z.string().min(1),
+  phoneNo: z.string().min(1),
 });
 
 const getDicebearUrl = (name: string) =>
   `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(name)}`;
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const parsed = registerSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
-  }
+  const { error } = await requireAuth(["Admin"]);
+  if (error) return error;
 
-  const { name, email, password, phoneNo, dob, gender } = parsed.data;
+  const body = await req.json();
+  const parsed = schema.safeParse(body);
+  if (!parsed.success)
+    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+
+  const { name, email, gender, dob, phoneNo } = parsed.data;
 
   const existing = await prisma.user.findFirst({
     where: { OR: [{ email }, { patient: { phoneNo } }] },
@@ -35,7 +37,8 @@ export async function POST(req: Request) {
     );
   }
 
-  const hashed = await bcrypt.hash(password, 10);
+  const tempPassword = crypto.randomUUID();
+  const hashed = await bcrypt.hash(tempPassword, 10);
 
   const user = await prisma.user.create({
     data: {
@@ -46,8 +49,8 @@ export async function POST(req: Request) {
       role: "Patient",
       patient: {
         create: {
-          dob: new Date(dob),
           gender,
+          dob: new Date(dob),
           phoneNo,
         },
       },

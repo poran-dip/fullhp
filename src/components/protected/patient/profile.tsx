@@ -241,8 +241,8 @@ export default function ProfileForm({ profile, error: initError }: Props) {
   const handleSaveInfo = async () => {
     setSavingInfo(true);
     try {
-      const res = await fetch("/api/patient/profile", {
-        method: "PUT",
+      const res = await fetch("/api/patients/me/profile", {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
@@ -272,8 +272,8 @@ export default function ProfileForm({ profile, error: initError }: Props) {
     }
     setSavingPassword(true);
     try {
-      const res = await fetch("/api/patient/password", {
-        method: "PUT",
+      const res = await fetch("/api/patients/me/password", {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           // only sent if they already have a password (change flow)

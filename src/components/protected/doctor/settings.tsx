@@ -125,8 +125,8 @@ export default function DoctorSettings({ profile, error: initError }: Props) {
   const handleSaveProfile = async () => {
     setSavingProfile(true);
     try {
-      const res = await fetch("/api/doctor/profile", {
-        method: "PUT",
+      const res = await fetch("/api/doctors/me/profile", {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
@@ -149,7 +149,7 @@ export default function DoctorSettings({ profile, error: initError }: Props) {
   const handleSaveStatus = async () => {
     setSavingStatus(true);
     try {
-      const res = await fetch("/api/doctor/status", {
+      const res = await fetch("/api/doctors/me/status", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
@@ -179,8 +179,8 @@ export default function DoctorSettings({ profile, error: initError }: Props) {
         (d) => !scheduleState[d].enabled && scheduleState[d].id !== null,
       ).map((d) => scheduleState[d].id);
 
-      const res = await fetch("/api/doctor/schedule", {
-        method: "PUT",
+      const res = await fetch("/api/doctors/me/schedule", {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ days, deletedIds }),
       });
@@ -204,8 +204,8 @@ export default function DoctorSettings({ profile, error: initError }: Props) {
     }
     setSavingPassword(true);
     try {
-      const res = await fetch("/api/doctor/password", {
-        method: "PUT",
+      const res = await fetch("/api/doctors/me/password", {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...(profile.hasPassword && { currentPassword }),
