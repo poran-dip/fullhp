@@ -129,7 +129,7 @@ export default function PatientsTable({ initialPatients, error }: Props) {
     setSubmitting(true);
     try {
       const res = await fetch(`/api/patients/${current.id}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });

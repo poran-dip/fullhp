@@ -258,7 +258,7 @@ export default function AppointmentsTable({
     setSubmitting(true);
     try {
       const res = await fetch(`/api/appointments/${current.id}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           patientId: form.patientId,

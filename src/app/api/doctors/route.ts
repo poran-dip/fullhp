@@ -1,31 +1,36 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/prisma";
 
-const registerSchema = z.object({
+const schema = z.object({
   name: z.string().min(1),
   email: z.email(),
   password: z.string().min(4),
+  specialization: z.string().min(1),
+  department: z.string().min(1),
   phoneNo: z.string().min(1),
-  dob: z.string().min(1),
-  gender: z.string().min(1),
+  image: z.string().optional(),
 });
 
 const getDicebearUrl = (name: string) =>
   `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(name)}`;
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const parsed = registerSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
-  }
+  const { error } = await requireAuth(["Admin"]);
+  if (error) return error;
 
-  const { name, email, password, phoneNo, dob, gender } = parsed.data;
+  const body = await req.json();
+  const parsed = schema.safeParse(body);
+  if (!parsed.success)
+    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+
+  const { name, email, password, specialization, department, phoneNo, image } =
+    parsed.data;
 
   const existing = await prisma.user.findFirst({
-    where: { OR: [{ email }, { patient: { phoneNo } }] },
+    where: { OR: [{ email }, { doctor: { phoneNo } }] },
   });
   if (existing) {
     const conflict = existing.email === email ? "Email" : "Phone number";
@@ -42,13 +47,14 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashed,
-      image: getDicebearUrl(name),
-      role: "Patient",
-      patient: {
+      image: image || getDicebearUrl(name),
+      role: "Doctor",
+      doctor: {
         create: {
-          dob: new Date(dob),
-          gender,
+          specialization,
+          department,
           phoneNo,
+          status: "Active",
         },
       },
     },
