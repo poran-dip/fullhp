@@ -1,167 +1,126 @@
-import { headers } from "next/headers";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
-import { getMedbotModel } from "@/lib/gemini";
+import { genAI } from "@/lib/gemini";
+import { getActiveDoctors } from "@/services/medbot";
 
-// Define chat session interface with session tracking
-interface ChatSession {
-  instance: ReturnType<ReturnType<typeof getMedbotModel>["startChat"]> | null;
-  hasInitialContext: boolean;
-  sessionId: string;
-}
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, "1 h"),
+  analytics: true,
+});
 
-// Global chat session state
-let chatSession: ChatSession = {
-  instance: null,
-  hasInitialContext: false,
-  sessionId: "",
-};
+const SYSTEM_PROMPT = (doctorList: string) => `
+You are a medical triage assistant. Based on the patient's symptoms, recommend the most appropriate doctor from the list below.
 
-// Constant guidelines that will be sent once
-const INITIAL_GUIDELINES = `You are MedBot, an interactive medical assistant chatbot. Your goal is to understand user symptoms through a structured conversation.
+AVAILABLE DOCTORS:
+${doctorList}
 
-CONVERSATION GUIDELINES:
-1. If this is the first message, introduce yourself and ask about their main health concern
-2. For follow-up messages:
-   - Acknowledge their response
-   - Ask relevant follow-up questions based on their symptoms
-   - Only proceed to recommendations after gathering sufficient information
+INSTRUCTIONS:
+- Analyze the symptoms carefully
+- Pick the single most appropriate doctor from the list above
+- Return ONLY valid JSON, no explanation, no markdown, no extra text
+- Do not compare with or reference other doctors by name or specialty
+- The reason should be warm and reassuring, e.g. "Dr. X is an excellent choice for your symptoms" — not clinical or comparative language like "most appropriate" or "best suited"
 
 RESPONSE FORMAT:
-## Response
-{Your direct response to the user}
-
-## Follow-up Question
-{Your next question to gather more information}
-
-## Analysis
-- Symptom Analysis: {Brief analysis of symptoms reported so far}
-- Specialist Type: {Recommended specialist if enough information gathered}
-- Urgency Level: {Any urgent warnings or immediate actions needed}
-
-## Context
-{Summary of conversation context for next interaction}
-
-Remember to:
-- Ask only one question at a time
-- Show empathy while maintaining professionalism
-- Flag any potentially serious symptoms
-- Keep responses conversational but focused
-- Donot waste time in asking irrelevant questions
-- ask open-ended questions to gather more information
-- ask closed-ended questions to confirm information
-- ask leading questions to guide the conversation
-- ask clarifying questions to understand the user's response
-- ask probing questions to explore the user's symptoms
-- make sure to ask about the user's medical history
-- at the end of the conversation, provide a summary of the user's symptoms and recommend a specialist if necessary
-- your responce should be clear and concise
-- make it quick and easy for the user to understand
-- come to conclusions based on the information provided
-- end the conversation with a follow-up question`;
+{
+  "department": "string",
+  "doctorId": "string",
+  "doctorName": "string",
+  "reason": "string"
+}
+`;
 
 export async function POST(req: Request) {
   try {
-    const { message, isFirstMessage } = await req.json();
-    const headersList = await headers();
-    const currentSessionId = headersList.get("x-session-id") || "";
-    const model = getMedbotModel();
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
 
-    // Reset session if ID changed or doesn't match
-    if (currentSessionId !== chatSession.sessionId) {
-      chatSession = {
-        instance: null,
-        hasInitialContext: false,
-        sessionId: currentSessionId,
-      };
+    const { success } = await ratelimit.limit(ip);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 },
+      );
     }
 
-    // Initialize or reset chat session if needed
-    if (isFirstMessage || !chatSession.instance) {
-      chatSession.instance = model.startChat();
-      chatSession.hasInitialContext = false;
+    const { symptoms } = await req.json();
+
+    if (!symptoms || typeof symptoms !== "string" || !symptoms.trim()) {
+      return NextResponse.json(
+        { error: "Symptoms are required." },
+        { status: 400 },
+      );
     }
 
-    // Send initial guidelines only once per chat session
-    if (!chatSession.hasInitialContext) {
-      await chatSession.instance.sendMessage(INITIAL_GUIDELINES);
-      chatSession.hasInitialContext = true;
+    const { doctors, error: dbError } = await getActiveDoctors();
+
+    if (dbError || doctors.length === 0) {
+      return NextResponse.json(
+        { error: "No doctors available at this time." },
+        { status: 503 },
+      );
     }
 
-    // Send user message and get response
-    const result = await chatSession.instance.sendMessage(message);
+    const doctorList = doctors
+      .map(
+        (d) =>
+          `- ID: ${d.id} | Name: ${d.user.name} | Department: ${d.department} | Specialization: ${d.specialization} | Rating: ${d.avgRating ?? "unrated"}`,
+      )
+      .join("\n");
 
-    if (!result?.response) {
-      throw new Error("Failed to generate response");
+    const response = await genAI.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `Patient symptoms: ${symptoms}` }],
+        },
+      ],
+      config: {
+        systemInstruction: SYSTEM_PROMPT(doctorList),
+        temperature: 0.3,
+      },
+    });
+
+    const raw = response.text?.trim() ?? "";
+    const cleaned = raw.replace(/```json|```/g, "").trim();
+    const result = JSON.parse(cleaned);
+
+    if (
+      !result.department ||
+      !result.doctorId ||
+      !result.doctorName ||
+      !result.reason
+    ) {
+      throw new Error("Incomplete response from model");
     }
 
-    const text = result.response.text();
-
-    if (!text) {
-      throw new Error("Empty response from model");
-    }
-
-    const structuredResponse = parseInteractiveResponse(text);
+    const matched = doctors.find((d) => d.id === result.doctorId);
 
     return NextResponse.json({
-      response: structuredResponse,
-      timestamp: new Date().toISOString(),
-      sessionId: chatSession.sessionId,
-      hasInitialContext: chatSession.hasInitialContext,
+      department: result.department,
+      doctorId: result.doctorId,
+      doctorName: result.doctorName,
+      reason: result.reason,
+      avgRating: matched?.avgRating ?? null,
     });
   } catch (error) {
     console.error("MedBot error:", error);
-    // Reset chat session completely on error
-    chatSession = {
-      instance: null,
-      hasInitialContext: false,
-      sessionId: "",
-    };
 
-    const errorMessage =
-      error instanceof Error ? error.message : "An unexpected error occurred";
+    const status = (error as { status?: number })?.status;
+
+    if (status === 503) {
+      return NextResponse.json(
+        { error: "Servers are being fried right now, try again in a moment." },
+        { status: 503 },
+      );
+    }
 
     return NextResponse.json(
-      {
-        error: errorMessage,
-        timestamp: new Date().toISOString(),
-      },
+      { error: "We had issues processing that, try again later." },
       { status: 500 },
     );
   }
-}
-
-function parseInteractiveResponse(response: string) {
-  const sections = response.split("##").filter((section) => section.trim());
-
-  const parseSection = (title: string): string => {
-    const section = sections.find((s) => s.trim().startsWith(title));
-    return section?.replace(title, "")?.trim() || "";
-  };
-
-  const analysisSection = parseSection("Analysis");
-  const analysisLines = analysisSection.split("\n");
-  const analysis = {
-    symptomAnalysis:
-      analysisLines
-        .find((line) => line.includes("Symptom Analysis:"))
-        ?.split(":")[1]
-        ?.trim() || "",
-    specialistType:
-      analysisLines
-        .find((line) => line.includes("Specialist Type:"))
-        ?.split(":")[1]
-        ?.trim() || "",
-    urgencyLevel:
-      analysisLines
-        .find((line) => line.includes("Urgency Level:"))
-        ?.split(":")[1]
-        ?.trim() || "",
-  };
-
-  return {
-    response: parseSection("Response"),
-    followUpQuestion: parseSection("Follow-up Question"),
-    analysis,
-    context: parseSection("Context"),
-  };
 }

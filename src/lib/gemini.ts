@@ -1,11 +1,11 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-if (!process.env.GEMINI_API_KEY) {
+const apiKey = process.env.GEMINI_API_KEY;
+
+if (!apiKey) {
   throw new Error("Missing Gemini API key");
 }
 
-export const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-export const getMedbotModel = () => {
-  return genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
-};
+export const genAI = new GoogleGenAI({
+  apiKey: apiKey,
+});
