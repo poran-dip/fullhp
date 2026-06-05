@@ -1,15 +1,16 @@
-import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import { Pool } from "pg";
 import { z } from "zod";
-import { PrismaClient } from "@/generated/prisma/client";
+import { prisma } from "./prisma";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+if (!googleClientId || !googleClientSecret) {
+  throw new Error("Missing Google OAuth credentials");
+}
 
 const credentialsSchema = z.object({
   email: z.email(),
@@ -22,7 +23,10 @@ const getDicebearUrl = (name: string | null) =>
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: { strategy: "jwt" },
   providers: [
-    Google,
+    Google({
+      clientId: googleClientId,
+      clientSecret: googleClientSecret,
+    }),
     Credentials({
       async authorize(credentials) {
         const parsed = credentialsSchema.safeParse(credentials);
