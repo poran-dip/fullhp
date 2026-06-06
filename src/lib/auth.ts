@@ -1,3 +1,4 @@
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
@@ -21,6 +22,7 @@ const getDicebearUrl = (name: string | null) =>
   `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(name ?? "?")}`;
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   providers: [
     Google({
