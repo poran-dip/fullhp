@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 const schema = z.object({
   name: z.string().min(1).optional(),
   email: z.email().optional(),
+  slug: z.string().min(2),
   specialization: z.string().min(1).optional(),
   department: z.string().min(1).optional(),
   phoneNo: z.string().min(1).optional(),
@@ -26,8 +27,16 @@ export async function PATCH(
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
-  const { name, email, specialization, department, phoneNo, image, status } =
-    parsed.data;
+  const {
+    name,
+    email,
+    slug,
+    specialization,
+    department,
+    phoneNo,
+    image,
+    status,
+  } = parsed.data;
 
   const doctor = await prisma.doctor.findUnique({ where: { id } });
   if (!doctor)
@@ -36,6 +45,7 @@ export async function PATCH(
   const updated = await prisma.doctor.update({
     where: { id },
     data: {
+      ...(slug !== undefined && { slug }),
       ...(specialization !== undefined && { specialization }),
       ...(department !== undefined && { department }),
       ...(phoneNo !== undefined && { phoneNo }),

@@ -143,7 +143,7 @@ export default function PatientOverview({ data, error }: Props) {
           </CardContent>
           <CardFooter>
             <Button variant="ghost" size="sm" asChild className="w-full">
-              <Link href="/dashboard/appointments">View all</Link>
+              <Link href="/patient/book">Book appointment</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -177,7 +177,7 @@ export default function PatientOverview({ data, error }: Props) {
           </CardContent>
           <CardFooter>
             <Button variant="ghost" size="sm" asChild className="w-full">
-              <Link href="/dashboard/appointments">View appointments</Link>
+              <Link href="/patient/tests">View tests</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -210,7 +210,7 @@ export default function PatientOverview({ data, error }: Props) {
           </CardContent>
           <CardFooter>
             <Button variant="ghost" size="sm" asChild className="w-full">
-              <Link href="/dashboard/appointments">View details</Link>
+              <Link href="/patient/appointments">View details</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -244,7 +244,7 @@ export default function PatientOverview({ data, error }: Props) {
           </CardContent>
           <CardFooter>
             <Button variant="ghost" size="sm" asChild className="w-full">
-              <Link href="/dashboard/appointments">View history</Link>
+              <Link href="/patient/appointments">View history</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -327,7 +327,7 @@ export default function PatientOverview({ data, error }: Props) {
           )}
           <div className="flex justify-center">
             <Button variant="outline" asChild>
-              <Link href="/dashboard/appointments">View All Appointments</Link>
+              <Link href="/patient/appointments">View All Appointments</Link>
             </Button>
           </div>
         </TabsContent>
@@ -385,7 +385,7 @@ export default function PatientOverview({ data, error }: Props) {
               </CardContent>
               <CardFooter className="flex justify-end p-6 pt-0">
                 <Button size="sm" asChild>
-                  <Link href="/dashboard/appointments">View Full History</Link>
+                  <Link href="/patient/appointments">View Full History</Link>
                 </Button>
               </CardFooter>
             </Card>

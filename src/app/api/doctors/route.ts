@@ -8,6 +8,7 @@ const schema = z.object({
   name: z.string().min(1),
   email: z.email(),
   password: z.string().min(4),
+  slug: z.string().min(2),
   specialization: z.string().min(1),
   department: z.string().min(1),
   phoneNo: z.string().min(1),
@@ -26,8 +27,16 @@ export async function POST(req: Request) {
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
-  const { name, email, password, specialization, department, phoneNo, image } =
-    parsed.data;
+  const {
+    name,
+    email,
+    password,
+    slug,
+    specialization,
+    department,
+    phoneNo,
+    image,
+  } = parsed.data;
 
   const existing = await prisma.user.findFirst({
     where: { OR: [{ email }, { doctor: { phoneNo } }] },
@@ -51,6 +60,7 @@ export async function POST(req: Request) {
       role: "Doctor",
       doctor: {
         create: {
+          slug,
           specialization,
           department,
           phoneNo,

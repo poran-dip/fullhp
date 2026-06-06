@@ -42,6 +42,7 @@ import { useApi } from "@/lib/api";
 
 interface Doctor {
   id: string;
+  slug: string;
   specialization: string;
   department: string;
   status: string;
@@ -64,6 +65,7 @@ const emptyForm = {
   name: "",
   email: "",
   password: "",
+  slug: "",
   specialization: "",
   department: "",
   phoneNo: "",
@@ -110,6 +112,7 @@ export default function DoctorsTable({ initialDoctors, error }: Props) {
       name: d.user.name ?? "",
       email: d.user.email ?? "",
       password: "",
+      slug: d.slug,
       specialization: d.specialization,
       department: d.department,
       phoneNo: d.phoneNo,
@@ -182,6 +185,7 @@ export default function DoctorsTable({ initialDoctors, error }: Props) {
     { key: "name", label: "Name", type: "text" },
     { key: "email", label: "Email", type: "email" },
     { key: "password", label: "Password", type: "password" },
+    { key: "slug", label: "Username", type: "text" },
     { key: "specialization", label: "Specialization", type: "text" },
     { key: "department", label: "Department", type: "text" },
     { key: "phoneNo", label: "Phone", type: "text" },
@@ -190,6 +194,7 @@ export default function DoctorsTable({ initialDoctors, error }: Props) {
   const editFields = [
     { key: "name", label: "Name", type: "text" },
     { key: "email", label: "Email", type: "email" },
+    { key: "slug", label: "Username", type: "text" },
     { key: "specialization", label: "Specialization", type: "text" },
     { key: "department", label: "Department", type: "text" },
     { key: "phoneNo", label: "Phone", type: "text" },
@@ -231,6 +236,7 @@ export default function DoctorsTable({ initialDoctors, error }: Props) {
               <TableHead>Photo</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Username</TableHead>
               <TableHead>Specialization</TableHead>
               <TableHead>Department</TableHead>
               <TableHead>Status</TableHead>
@@ -270,6 +276,7 @@ export default function DoctorsTable({ initialDoctors, error }: Props) {
                     {d.user.name ?? "—"}
                   </TableCell>
                   <TableCell>{d.user.email ?? "—"}</TableCell>
+                  <TableCell>{d.slug}</TableCell>
                   <TableCell>{d.specialization}</TableCell>
                   <TableCell>{d.department}</TableCell>
                   <TableCell>{d.status}</TableCell>
@@ -405,6 +412,7 @@ export default function DoctorsTable({ initialDoctors, error }: Props) {
                 !form.name ||
                 !form.email ||
                 !form.password ||
+                !form.slug ||
                 !form.specialization ||
                 !form.department ||
                 !form.phoneNo
@@ -497,6 +505,7 @@ export default function DoctorsTable({ initialDoctors, error }: Props) {
                 submitting ||
                 !form.name ||
                 !form.email ||
+                !form.slug ||
                 !form.specialization ||
                 !form.department ||
                 !form.phoneNo
