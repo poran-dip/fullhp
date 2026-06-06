@@ -10,7 +10,6 @@ datasource db {
 enum Role {
   Patient
   Doctor
-  Driver
   Admin
 }
 
@@ -28,12 +27,6 @@ enum DoctorStatus {
   Active
   Inactive
   OnLeave
-}
-
-enum DriverStatus {
-  Available
-  OnDuty
-  Unavailable
 }
 
 enum AppointmentStatus {
@@ -54,7 +47,6 @@ model User {
   role          Role      @default(Patient)
   patient       Patient?
   doctor        Doctor?
-  driver        Driver?
   admin         Admin?
   accounts      Account[]
   sessions      Session[]
@@ -141,6 +133,7 @@ model Doctor {
   id             String        @id @default(cuid(2))
   userId         String        @unique @map("user_id")
   user           User          @relation(fields: [userId], references: [id])
+  slug           String        @unique
   phoneNo        String        @unique @map("phone_no")
   specialization String
   department     String
@@ -157,23 +150,6 @@ model Doctor {
   @@index([status])
   @@index([department, status])
   @@map("doctors")
-}
-
-model Driver {
-  id           String        @id @default(cuid(2))
-  userId       String        @unique @map("user_id")
-  user         User          @relation(fields: [userId], references: [id])
-  lat          Float?
-  lon          Float?
-  status       DriverStatus
-  appointments Appointment[]
-  ratings      Rating[]
-  avgRating    Float?        @map("avg_rating")
-  ratingCount  Int?          @map("rating_count")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-
-  @@map("drivers")
 }
 
 model Admin {
@@ -212,7 +188,6 @@ model Appointment {
   id             String            @id @default(cuid(2))
   patientId      String            @map("patient_id")
   doctorId       String?           @map("doctor_id")
-  driverId       String?           @map("driver_id")
   time           DateTime
   status         AppointmentStatus
   department     String?
@@ -225,13 +200,11 @@ model Appointment {
 
   patient             Patient               @relation(fields: [patientId], references: [id])
   doctor              Doctor?               @relation(fields: [doctorId], references: [id])
-  driver              Driver?               @relation(fields: [driverId], references: [id])
   relatedAppointments AppointmentRelation[] @relation("AppointmentFrom")
   relatedTo           AppointmentRelation[] @relation("AppointmentTo")
 
   @@index([patientId])
   @@index([doctorId])
-  @@index([driverId])
   @@index([status])
   @@index([doctorId, status])
   @@map("appointments")
@@ -254,18 +227,14 @@ model Rating {
   comment   String?
   patientId String   @map("patient_id")
   doctorId  String?  @map("doctor_id")
-  driverId  String?  @map("driver_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   patient Patient @relation(fields: [patientId], references: [id])
   doctor  Doctor? @relation(fields: [doctorId], references: [id])
-  driver  Driver? @relation(fields: [driverId], references: [id])
 
   @@unique([patientId, doctorId])
-  @@unique([patientId, driverId])
   @@index([doctorId])
-  @@index([driverId])
   @@index([patientId])
   @@map("ratings")
 }

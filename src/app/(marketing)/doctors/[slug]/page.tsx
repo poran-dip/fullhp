@@ -1,16 +1,16 @@
 import { notFound } from "next/navigation";
 import DoctorProfileClient from "@/components/marketing/doctor-profile";
 import { auth } from "@/lib/auth";
-import { getDoctorById } from "@/services/doctor";
+import { getDoctorBySlug } from "@/services/doctor";
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export default async function DoctorProfilePage({ params }: Props) {
-  const { id } = await params;
+  const { slug } = await params;
   const [{ doctor, error }, session] = await Promise.all([
-    getDoctorById(id),
+    getDoctorBySlug(slug),
     auth(),
   ]);
 

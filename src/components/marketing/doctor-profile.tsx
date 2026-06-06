@@ -59,6 +59,7 @@ type Rating = {
 
 type Doctor = {
   id: string;
+  slug: string;
   specialization: string;
   department: string;
   status: keyof typeof statusConfig;
@@ -124,7 +125,7 @@ export default function DoctorProfileClient({ doctor, isLoggedIn }: Props) {
       router.push("/login");
       return;
     }
-    router.push(`/patient/book?doctorId=${doctor.id}`);
+    router.push(`/patient/book?doctor=${doctor.slug}`);
   };
 
   return (

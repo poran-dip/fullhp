@@ -36,12 +36,6 @@ export async function getAppointments(filters?: {
             user: { select: { name: true } },
           },
         },
-        driver: {
-          select: {
-            id: true,
-            user: { select: { name: true } },
-          },
-        },
       },
       orderBy: { time: "desc" },
     });

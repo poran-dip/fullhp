@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useApi } from "@/lib/api";
 
 interface Patient {
   id: string;
@@ -34,9 +35,9 @@ interface DoctorOverviewProps {
 }
 
 export default function DoctorOverview({ data, error }: DoctorOverviewProps) {
-  const [appointments, setAppointments] = useState<Appointment[]>(
-    data?.appointments ?? [],
-  );
+  const { apiFetch } = useApi();
+
+  const appointments: Appointment[] = data?.appointments ?? [];
   const [acknowledging, setAcknowledging] = useState<string | null>(null);
 
   const today = new Date();
@@ -54,19 +55,13 @@ export default function DoctorOverview({ data, error }: DoctorOverviewProps) {
   const handleAcknowledge = async (appointmentId: string) => {
     setAcknowledging(appointmentId);
     try {
-      const res = await fetch(`/api/appointments/${appointmentId}`, {
+      const res = await apiFetch(`/api/appointments/${appointmentId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "DoctorAssigned" }),
       });
 
       if (!res.ok) throw new Error("Failed to update");
-
-      setAppointments((prev) =>
-        prev.map((a) =>
-          a.id === appointmentId ? { ...a, status: "DoctorAssigned" } : a,
-        ),
-      );
     } catch (err) {
       console.error("Failed to acknowledge appointment:", err);
     } finally {

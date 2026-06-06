@@ -65,6 +65,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useApi } from "@/lib/api";
 
 type AppointmentStatus =
   | "Requested"
@@ -86,7 +87,6 @@ interface Appointment {
     department: string;
     user: { name: string | null };
   } | null;
-  driver: { id: string; user: { name: string | null } } | null;
 }
 
 interface Patient {
@@ -159,6 +159,7 @@ export default function AppointmentsTable({
   defaultDoctorId,
 }: Props) {
   const router = useRouter();
+  const { apiFetch } = useApi();
   const [appointments, setAppointments] =
     useState<Appointment[]>(initialAppointments);
   const [search, setSearch] = useState("");
@@ -230,7 +231,7 @@ export default function AppointmentsTable({
   const handleAdd = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch("/api/appointments", {
+      const res = await apiFetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -245,7 +246,6 @@ export default function AppointmentsTable({
       if (!res.ok) throw new Error();
       toast.success("Appointment created");
       setAddOpen(false);
-      router.refresh();
     } catch {
       toast.error("Failed to create appointment");
     } finally {
@@ -257,7 +257,7 @@ export default function AppointmentsTable({
     if (!current) return;
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/appointments/${current.id}`, {
+      const res = await apiFetch(`/api/appointments/${current.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -272,7 +272,6 @@ export default function AppointmentsTable({
       if (!res.ok) throw new Error();
       toast.success("Appointment updated");
       setEditOpen(false);
-      router.refresh();
     } catch {
       toast.error("Failed to update appointment");
     } finally {
@@ -284,7 +283,7 @@ export default function AppointmentsTable({
     if (!current) return;
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/appointments/${current.id}`, {
+      const res = await apiFetch(`/api/appointments/${current.id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error();
@@ -305,9 +304,11 @@ export default function AppointmentsTable({
         <div className="col-span-3">
           <Combobox
             items={patients}
-            itemToStringValue={(p) =>
+            itemToStringLabel={(p) =>
               [p.user.name, p.user.email, p.phoneNo].filter(Boolean).join(" ")
             }
+            itemToStringValue={(p) => p?.id ?? ""}
+            isItemEqualToValue={(item, value) => item.id === value.id}
             value={patients.find((p) => p.id === form.patientId) ?? null}
             onValueChange={(p) => field("patientId", p?.id ?? "")}
           >
@@ -338,11 +339,13 @@ export default function AppointmentsTable({
             items={doctors.filter(
               (d) => !form.department || d.department === form.department,
             )}
-            itemToStringValue={(d) =>
+            itemToStringLabel={(d) =>
               [d.user.name, d.specialization, d.department]
                 .filter(Boolean)
                 .join(" ")
             }
+            itemToStringValue={(d) => d?.id ?? ""}
+            isItemEqualToValue={(item, value) => item.id === value.id}
             value={doctors.find((d) => d.id === form.doctorId) ?? null}
             onValueChange={(d) => {
               field("doctorId", d?.id ?? "");

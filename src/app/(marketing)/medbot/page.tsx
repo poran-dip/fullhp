@@ -12,10 +12,11 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useApi } from "@/lib/api";
 
 interface MedbotResult {
   department: string;
-  doctorId: string;
+  doctorSlug: string;
   doctorName: string;
   reason: string;
   avgRating: number | null;
@@ -50,6 +51,8 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export default function MedbotPage() {
+  const { apiFetch } = useApi();
+
   const [symptoms, setSymptoms] = useState("");
   const [result, setResult] = useState<MedbotResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -67,7 +70,7 @@ export default function MedbotPage() {
     setResult(null);
 
     try {
-      const res = await fetch("/api/medbot", {
+      const res = await apiFetch("/api/medbot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ symptoms }),
@@ -180,7 +183,7 @@ export default function MedbotPage() {
                   {result.reason}
                 </p>
                 <Link
-                  href={`/patient/book?doctorId=${result.doctorId}&department=${encodeURIComponent(result.department)}`}
+                  href={`/patient/book?doctor=${result.doctorSlug}&department=${encodeURIComponent(result.department)}`}
                 >
                   <Button className="w-full bg-black text-white hover:bg-gray-800 mt-1">
                     <CalendarPlus className="h-4 w-4 mr-2" />

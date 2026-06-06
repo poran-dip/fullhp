@@ -27,6 +27,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useApi } from "@/lib/api";
 import type { DoctorProfile } from "@/services/doctor-profile";
 
 const WEEKDAYS = [
@@ -74,6 +75,8 @@ interface Props {
 }
 
 export default function DoctorSettings({ profile, error: initError }: Props) {
+  const { apiFetch } = useApi();
+
   // ── profile state ──
   const [name, setName] = useState(profile?.name ?? "");
   const [email, setEmail] = useState(profile?.email ?? "");
@@ -125,7 +128,7 @@ export default function DoctorSettings({ profile, error: initError }: Props) {
   const handleSaveProfile = async () => {
     setSavingProfile(true);
     try {
-      const res = await fetch("/api/doctors/me/profile", {
+      const res = await apiFetch("/api/doctors/me/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -149,7 +152,7 @@ export default function DoctorSettings({ profile, error: initError }: Props) {
   const handleSaveStatus = async () => {
     setSavingStatus(true);
     try {
-      const res = await fetch("/api/doctors/me/status", {
+      const res = await apiFetch("/api/doctors/me/status", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
@@ -179,7 +182,7 @@ export default function DoctorSettings({ profile, error: initError }: Props) {
         (d) => !scheduleState[d].enabled && scheduleState[d].id !== null,
       ).map((d) => scheduleState[d].id);
 
-      const res = await fetch("/api/doctors/me/schedule", {
+      const res = await apiFetch("/api/doctors/me/schedule", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ days, deletedIds }),
@@ -204,7 +207,7 @@ export default function DoctorSettings({ profile, error: initError }: Props) {
     }
     setSavingPassword(true);
     try {
-      const res = await fetch("/api/doctors/me/password", {
+      const res = await apiFetch("/api/doctors/me/password", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useApi } from "@/lib/api";
 
 interface Prescription {
   id: string;
@@ -61,6 +62,7 @@ export default function DoctorAppointmentDetail({
   error,
 }: DoctorAppointmentDetailProps) {
   const router = useRouter();
+  const { apiFetch } = useApi();
 
   const [prescriptions, setPrescriptions] = useState<Prescription[]>(
     data?.prescriptions ?? [],
@@ -105,7 +107,7 @@ export default function DoctorAppointmentDetail({
   };
 
   const patch = async (body: Record<string, unknown>) => {
-    const res = await fetch(`/api/appointments/${data.id}`, {
+    const res = await apiFetch(`/api/appointments/${data.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -131,7 +133,7 @@ export default function DoctorAppointmentDetail({
       return;
     setAddingPrescription(true);
     try {
-      const res = await fetch(`/api/appointments/${data.id}/prescriptions`, {
+      const res = await apiFetch(`/api/appointments/${data.id}/prescriptions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newPrescription),
@@ -150,7 +152,7 @@ export default function DoctorAppointmentDetail({
 
   const handleDeletePrescription = async (id: string) => {
     try {
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/appointments/${data.id}/prescriptions/${id}`,
         {
           method: "DELETE",
@@ -168,7 +170,7 @@ export default function DoctorAppointmentDetail({
     if (!newTest.test.trim()) return;
     setAddingTest(true);
     try {
-      const res = await fetch(`/api/appointments/${data.id}/tests`, {
+      const res = await apiFetch(`/api/appointments/${data.id}/tests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -190,7 +192,7 @@ export default function DoctorAppointmentDetail({
 
   const handleUpdateTestResult = async (id: string, result: string) => {
     try {
-      const res = await fetch(`/api/appointments/${data.id}/tests/${id}`, {
+      const res = await apiFetch(`/api/appointments/${data.id}/tests/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ result }),
@@ -205,7 +207,7 @@ export default function DoctorAppointmentDetail({
 
   const handleDeleteTest = async (id: string) => {
     try {
-      const res = await fetch(`/api/appointments/${data.id}/tests/${id}`, {
+      const res = await apiFetch(`/api/appointments/${data.id}/tests/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error();

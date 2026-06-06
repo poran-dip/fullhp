@@ -3,12 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export interface BookingDoctor {
   id: string;
+  slug: string;
   name: string | null;
   specialization: string;
   department: string;
 }
 
-export async function getBookingData(doctorId?: string) {
+export async function getBookingData(doctorSlug?: string) {
   const session = await auth();
   if (!session?.user?.id) {
     return { doctors: [], preselectedDoctor: null, error: "Unauthorized" };
@@ -19,6 +20,7 @@ export async function getBookingData(doctorId?: string) {
       where: { status: "Active" },
       select: {
         id: true,
+        slug: true,
         specialization: true,
         department: true,
         user: { select: { name: true } },
@@ -28,13 +30,14 @@ export async function getBookingData(doctorId?: string) {
 
     const mapped: BookingDoctor[] = doctors.map((d) => ({
       id: d.id,
+      slug: d.slug,
       name: d.user.name,
       specialization: d.specialization,
       department: d.department,
     }));
 
-    const preselectedDoctor = doctorId
-      ? (mapped.find((d) => d.id === doctorId) ?? null)
+    const preselectedDoctor = doctorSlug
+      ? (mapped.find((d) => d.slug === doctorSlug) ?? null)
       : null;
 
     return { doctors: mapped, preselectedDoctor, error: null };

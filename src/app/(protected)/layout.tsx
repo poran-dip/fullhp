@@ -52,18 +52,12 @@ const navByRole: Record<string, NavItem[]> = {
     { name: "Appointments", href: "/admin/appointments", icon: Calendar },
     { name: "Ambulances", href: "/admin/ambulances", icon: Truck },
   ],
-  [Role.Driver]: [
-    { name: "Home", href: "/driver", icon: Home },
-    { name: "Assignments", href: "/driver/assignments", icon: Calendar },
-    { name: "Settings", href: "/driver/settings", icon: Settings },
-  ],
 };
 
 const portalLabel: Record<string, string> = {
   [Role.Patient]: "Patient Portal",
   [Role.Doctor]: "Doctor Portal",
   [Role.Admin]: "Admin Portal",
-  [Role.Driver]: "Driver Portal",
 };
 
 export default async function ProtectedLayout({
@@ -110,7 +104,7 @@ export default async function ProtectedLayout({
             <form
               action={async () => {
                 "use server";
-                await signOut({ redirectTo: "/" });
+                await signOut();
               }}
             >
               <Button variant="destructive" className="w-full" type="submit">

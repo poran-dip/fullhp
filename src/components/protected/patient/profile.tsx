@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { useApi } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { PatientProfile } from "@/services/patient-profile";
 
@@ -199,6 +200,8 @@ function DobCalendar({
 // ─── main component ───────────────────────────────────────────────────────────
 
 export default function ProfileForm({ profile, error: initError }: Props) {
+  const { apiFetch } = useApi();
+
   // personal info state
   const [name, setName] = useState(profile?.name ?? "");
   const [email, setEmail] = useState(profile?.email ?? "");
@@ -241,7 +244,7 @@ export default function ProfileForm({ profile, error: initError }: Props) {
   const handleSaveInfo = async () => {
     setSavingInfo(true);
     try {
-      const res = await fetch("/api/patients/me/profile", {
+      const res = await apiFetch("/api/patients/me/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -272,7 +275,7 @@ export default function ProfileForm({ profile, error: initError }: Props) {
     }
     setSavingPassword(true);
     try {
-      const res = await fetch("/api/patients/me/password", {
+      const res = await apiFetch("/api/patients/me/password", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

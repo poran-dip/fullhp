@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useApi } from "@/lib/api";
 
 interface Patient {
   id: string;
@@ -59,6 +60,8 @@ export default function DoctorAppointmentsList({
   data,
   error,
 }: DoctorAppointmentsListProps) {
+  const { apiFetch } = useApi();
+
   const [search, setSearch] = useState("");
   const [timeFilter, setTimeFilter] = useState<"upcoming" | "past" | "all">(
     "upcoming",
@@ -66,8 +69,7 @@ export default function DoctorAppointmentsList({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [page, setPage] = useState(1);
-
-  const now = new Date();
+  const [completing, setCompleting] = useState<string | null>(null);
 
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
@@ -90,10 +92,10 @@ export default function DoctorAppointmentsList({
         timeFilter === "all"
           ? true
           : timeFilter === "upcoming"
-            ? aTime >= now &&
+            ? aTime >= todayStart &&
               a.status !== "Completed" &&
               a.status !== "Cancelled"
-            : aTime < now ||
+            : aTime < todayStart ||
               a.status === "Completed" ||
               a.status === "Cancelled";
 
@@ -104,7 +106,7 @@ export default function DoctorAppointmentsList({
 
       return matchesSearch && matchesTime && matchesStart && matchesEnd;
     });
-  }, [data, search, timeFilter, startDate, endDate, now]);
+  }, [data, search, timeFilter, startDate, endDate, todayStart]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -117,6 +119,16 @@ export default function DoctorAppointmentsList({
   const handleSearch = (val: string) => {
     setSearch(val);
     setPage(1);
+  };
+
+  const handleComplete = async (id: string) => {
+    setCompleting(id);
+    await apiFetch(`/api/appointments/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "Completed" }),
+    });
+    setCompleting(null);
   };
 
   const formatDateTime = (iso: string) =>
@@ -216,11 +228,23 @@ export default function DoctorAppointmentsList({
                     </p>
                   )}
                 </div>
-                <Link href={`/doctor/appointments/${a.id}`}>
-                  <Button variant="outline" size="sm">
-                    View
-                  </Button>
-                </Link>
+                <div className="flex gap-2 items-center">
+                  {a.status !== "Completed" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={completing === a.id}
+                      onClick={() => handleComplete(a.id)}
+                    >
+                      {completing === a.id ? "Saving..." : "Mark Complete"}
+                    </Button>
+                  )}
+                  <Link href={`/doctor/appointments/${a.id}`}>
+                    <Button variant="outline" size="sm">
+                      View
+                    </Button>
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

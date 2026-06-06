@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useApi } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { AppointmentItem } from "@/services/patient-appointments";
 
@@ -126,6 +127,8 @@ function RatingDialog({
   onSuccess,
   onDelete,
 }: RatingDialogProps) {
+  const { apiFetch } = useApi();
+
   const [stars, setStars] = useState(existing?.stars ?? 0);
   const [hovered, setHovered] = useState(0);
   const [comment, setComment] = useState(existing?.comment ?? "");
@@ -140,7 +143,7 @@ function RatingDialog({
     }
     setSubmitting(true);
     try {
-      const res = await fetch("/api/ratings", {
+      const res = await apiFetch("/api/ratings", {
         method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ doctorId, appointmentId, stars, comment }),
@@ -159,7 +162,7 @@ function RatingDialog({
   const handleDelete = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch("/api/ratings", {
+      const res = await apiFetch("/api/ratings", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ doctorId }),

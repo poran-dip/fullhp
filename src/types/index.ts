@@ -5,6 +5,7 @@ import type {
 
 export type DoctorWithUser = {
   id: string;
+  slug: string;
   specialization: string;
   department: string;
   status: DoctorStatus;

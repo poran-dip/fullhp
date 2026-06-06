@@ -29,12 +29,12 @@ export default function FeaturedDoctorsSection({
   const { data: session } = useSession();
   const router = useRouter();
 
-  const handleBookAppointment = (doctorId: string) => {
+  const handleBookAppointment = (doctorSlug: string) => {
     if (!session?.user) {
       router.push("/login");
       return;
     }
-    router.push(`/patient/book?doctorId=${doctorId}`);
+    router.push(`/patient/book?doctor=${doctorSlug}`);
   };
 
   if (error) {
@@ -113,12 +113,12 @@ export default function FeaturedDoctorsSection({
                     <Button
                       size="sm"
                       className="bg-black text-white hover:bg-gray-800"
-                      onClick={() => handleBookAppointment(doctor.id)}
+                      onClick={() => handleBookAppointment(doctor.slug)}
                     >
                       Book
                     </Button>
                     <Button size="sm" variant="outline" asChild>
-                      <Link href={`/doctors/${doctor.id}`}>Profile</Link>
+                      <Link href={`/doctors/${doctor.slug}`}>Profile</Link>
                     </Button>
                   </div>
                 </div>
@@ -173,12 +173,12 @@ export default function FeaturedDoctorsSection({
                 <div className="flex flex-col gap-2 pt-1">
                   <Button
                     className="w-full bg-black text-white hover:bg-gray-800"
-                    onClick={() => handleBookAppointment(doctor.id)}
+                    onClick={() => handleBookAppointment(doctor.slug)}
                   >
                     Book Appointment
                   </Button>
                   <Button variant="outline" className="w-full" asChild>
-                    <Link href={`/doctors/${doctor.id}`}>View Profile</Link>
+                    <Link href={`/doctors/${doctor.slug}`}>View Profile</Link>
                   </Button>
                 </div>
               </div>

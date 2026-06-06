@@ -26,7 +26,7 @@ INSTRUCTIONS:
 RESPONSE FORMAT:
 {
   "department": "string",
-  "doctorId": "string",
+  "doctorSlug": "string",
   "doctorName": "string",
   "reason": "string"
 }
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     const doctorList = doctors
       .map(
         (d) =>
-          `- ID: ${d.id} | Name: ${d.user.name} | Department: ${d.department} | Specialization: ${d.specialization} | Rating: ${d.avgRating ?? "unrated"}`,
+          `- ID: ${d.id} | Name: ${d.user.name} | Slug: ${d.slug} | Department: ${d.department} | Specialization: ${d.specialization} | Rating: ${d.avgRating ?? "unrated"}`,
       )
       .join("\n");
 

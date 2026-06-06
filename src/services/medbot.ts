@@ -6,6 +6,7 @@ export async function getActiveDoctors() {
       where: { status: "Active" },
       select: {
         id: true,
+        slug: true,
         specialization: true,
         department: true,
         avgRating: true,

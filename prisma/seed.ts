@@ -1,12 +1,7 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import { Pool } from "pg";
-import {
-  DoctorStatus,
-  DriverStatus,
-  PrismaClient,
-  Role,
-} from "@/generated/prisma/client";
+import { DoctorStatus, PrismaClient, Role } from "@/generated/prisma/client";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -90,6 +85,7 @@ async function main() {
         image: "https://randomuser.me/api/portraits/men/3.jpg",
         doctor: {
           create: {
+            slug: "sosangkar",
             phoneNo: "000",
             department: "Neurology",
             specialization: "Cognitive & Behavioral Neurology",
@@ -108,6 +104,7 @@ async function main() {
         image: "https://randomuser.me/api/portraits/women/3.jpg",
         doctor: {
           create: {
+            slug: "kristina",
             phoneNo: "111",
             department: "Psychiatry",
             specialization: "Child & Adolescent Psychiatry",
@@ -126,6 +123,7 @@ async function main() {
         image: "https://randomuser.me/api/portraits/men/9.jpg",
         doctor: {
           create: {
+            slug: "kundil",
             phoneNo: "222",
             department: "Pediatrics",
             specialization: "Developmental-Behavioral Pediatrics",
@@ -144,6 +142,7 @@ async function main() {
         image: "https://randomuser.me/api/portraits/women/4.jpg",
         doctor: {
           create: {
+            slug: "anu",
             phoneNo: "999",
             department: "Neurology",
             specialization: "Epilepsy (Epileptology)",
@@ -157,12 +156,16 @@ async function main() {
         name: "Dishita",
         email: "dishita@example.com",
         emailVerified: new Date(),
-        password: await bcrypt.hash("driver11", 10),
-        role: Role.Driver,
+        password: await bcrypt.hash("doctor11", 10),
+        role: Role.Doctor,
         image: "https://randomuser.me/api/portraits/women/6.jpg",
-        driver: {
+        doctor: {
           create: {
-            status: DriverStatus.Available,
+            slug: "dishita",
+            phoneNo: "911",
+            department: "Cardiology",
+            specialization: "Interventional Cardiology",
+            status: DoctorStatus.Active,
           },
         },
       },
@@ -172,12 +175,16 @@ async function main() {
         name: "Ruhan",
         email: "ruhan@example.com",
         emailVerified: new Date(),
-        password: await bcrypt.hash("driver99", 10),
-        role: Role.Driver,
+        password: await bcrypt.hash("doctor99", 10),
+        role: Role.Doctor,
         image: "https://randomuser.me/api/portraits/men/6.jpg",
-        driver: {
+        doctor: {
           create: {
-            status: DriverStatus.Available,
+            slug: "ruhan",
+            phoneNo: "912",
+            department: "Orthopedics",
+            specialization: "Sports Medicine & Joint Reconstruction",
+            status: DoctorStatus.Active,
           },
         },
       },

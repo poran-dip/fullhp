@@ -36,6 +36,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import { useApi } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { BookingDoctor } from "@/services/book-appointment";
 
@@ -177,6 +178,7 @@ export default function BookAppointment({
   error,
 }: Props) {
   const router = useRouter();
+  const { apiFetch } = useApi();
 
   const [department, setDepartment] = useState(
     preselectedDoctor?.department ?? "",
@@ -243,7 +245,7 @@ export default function BookAppointment({
 
     setSubmitting(true);
     try {
-      const res = await fetch("/api/appointments", {
+      const res = await apiFetch("/api/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

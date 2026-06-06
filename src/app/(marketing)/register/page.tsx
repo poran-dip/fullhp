@@ -14,8 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useApi } from "@/lib/api";
 
 export default function RegisterPage() {
+  const { apiFetch } = useApi();
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -44,7 +47,7 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch("/api/auth/register", {
+      const res = await apiFetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

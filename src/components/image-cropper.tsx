@@ -2,6 +2,7 @@ import { Loader2 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import { toast } from "sonner";
+import { useApi } from "@/lib/api";
 import { Button } from "./ui/button";
 
 interface CropArea {
@@ -51,6 +52,8 @@ interface ImageCropperProps {
 }
 
 export function ImageCropper({ onDone, onCancel }: ImageCropperProps) {
+  const { apiFetch } = useApi();
+
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -79,7 +82,7 @@ export function ImageCropper({ onDone, onCancel }: ImageCropperProps) {
       const blob = await getCroppedBlob(imageSrc, croppedAreaPixels);
       const formData = new FormData();
       formData.append("file", blob, "avatar.jpg");
-      const res = await fetch("/api/upload", {
+      const res = await apiFetch("/api/upload", {
         method: "POST",
         body: formData,
       });

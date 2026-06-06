@@ -9,7 +9,6 @@ export async function navigateByRole() {
     Patient: "/patient",
     Doctor: "/doctor",
     Admin: "/admin",
-    Driver: "/driver",
   };
 
   redirect(routes[role ?? ""] ?? "/");

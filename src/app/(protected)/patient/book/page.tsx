@@ -4,11 +4,11 @@ import { getBookingData } from "@/services/book-appointment";
 export default async function BookPage({
   searchParams,
 }: {
-  searchParams: Promise<{ doctorId?: string }>;
+  searchParams: Promise<{ doctor?: string }>;
 }) {
   const params = await searchParams;
   const { doctors, preselectedDoctor, error } = await getBookingData(
-    params.doctorId,
+    params.doctor,
   );
   return (
     <BookAppointment

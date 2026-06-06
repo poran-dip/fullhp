@@ -24,12 +24,12 @@ export default function DoctorResults({
   const { data: session } = useSession();
   const router = useRouter();
 
-  const handleBookAppointment = (doctorId: string) => {
+  const handleBookAppointment = (doctorSlug: string) => {
     if (!session?.user) {
       router.push("/login");
       return;
     }
-    router.push(`/patient/book?doctorId=${doctorId}`);
+    router.push(`/patient/book?doctor=${doctorSlug}`);
   };
 
   if (!hasSearched) return null;
@@ -110,12 +110,12 @@ export default function DoctorResults({
                 <div className="flex items-center sm:flex-col sm:items-end gap-2 mt-4 sm:mt-0">
                   <Button
                     className="bg-black text-white hover:bg-gray-800"
-                    onClick={() => handleBookAppointment(doctor.id)}
+                    onClick={() => handleBookAppointment(doctor.slug)}
                   >
                     Book Appointment
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link href={`/doctors/${doctor.id}`}>View Profile</Link>
+                    <Link href={`/doctors/${doctor.slug}`}>View Profile</Link>
                   </Button>
                 </div>
               </div>

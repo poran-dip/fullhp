@@ -79,13 +79,13 @@ export default function DoctorsList({ doctors, error }: DoctorsListProps) {
     setPage(1);
   };
 
-  const handleBook = (doctorId: string, status: string) => {
+  const handleBook = (doctorSlug: string, status: string) => {
     if (status !== "Active") return;
     if (!session?.user) {
       router.push("/login");
       return;
     }
-    router.push(`/patient/book?doctorId=${doctorId}`);
+    router.push(`/patient/book?doctor=${doctorSlug}`);
   };
 
   if (error) {
@@ -209,13 +209,13 @@ export default function DoctorsList({ doctors, error }: DoctorsListProps) {
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
                   <Button size="sm" variant="outline" asChild>
-                    <Link href={`/doctors/${doctor.id}`}>Profile</Link>
+                    <Link href={`/doctors/${doctor.slug}`}>Profile</Link>
                   </Button>
                   <Button
                     size="sm"
                     disabled={!isBookable}
                     className={`bg-black text-white hover:bg-neutral-800 disabled:opacity-50 ${!isBookable && `cursor-pointer`}`}
-                    onClick={() => handleBook(doctor.id, doctor.status)}
+                    onClick={() => handleBook(doctor.slug, doctor.status)}
                   >
                     Book
                   </Button>

@@ -2,7 +2,6 @@
 
 import { Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -38,6 +37,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useApi } from "@/lib/api";
 
 interface Patient {
   id: string;
@@ -59,7 +59,7 @@ interface Props {
 const emptyForm = { name: "", email: "", gender: "", dob: "", phoneNo: "" };
 
 export default function PatientsTable({ initialPatients, error }: Props) {
-  const router = useRouter();
+  const { apiFetch } = useApi();
   const [patients, setPatients] = useState<Patient[]>(initialPatients);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -108,7 +108,7 @@ export default function PatientsTable({ initialPatients, error }: Props) {
   const handleAdd = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch("/api/patients", {
+      const res = await apiFetch("/api/patients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -116,7 +116,6 @@ export default function PatientsTable({ initialPatients, error }: Props) {
       if (!res.ok) throw new Error();
       toast.success("Patient created");
       setAddOpen(false);
-      router.refresh();
     } catch {
       toast.error("Failed to create patient");
     } finally {
@@ -128,7 +127,7 @@ export default function PatientsTable({ initialPatients, error }: Props) {
     if (!current) return;
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/patients/${current.id}`, {
+      const res = await apiFetch(`/api/patients/${current.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -136,7 +135,6 @@ export default function PatientsTable({ initialPatients, error }: Props) {
       if (!res.ok) throw new Error();
       toast.success("Patient updated");
       setEditOpen(false);
-      router.refresh();
     } catch {
       toast.error("Failed to update patient");
     } finally {
@@ -148,7 +146,7 @@ export default function PatientsTable({ initialPatients, error }: Props) {
     if (!current) return;
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/patients/${current.id}`, {
+      const res = await apiFetch(`/api/patients/${current.id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error();

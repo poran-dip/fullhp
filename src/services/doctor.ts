@@ -5,6 +5,7 @@ export async function getDoctors() {
     const doctors = await prisma.doctor.findMany({
       select: {
         id: true,
+        slug: true,
         specialization: true,
         department: true,
         status: true,
@@ -43,6 +44,70 @@ export async function getDoctorById(id: string) {
       where: { id },
       select: {
         id: true,
+        slug: true,
+        specialization: true,
+        department: true,
+        status: true,
+        avgRating: true,
+        ratingCount: true,
+        phoneNo: true,
+        createdAt: true,
+        user: {
+          select: {
+            name: true,
+            image: true,
+            email: true,
+          },
+        },
+        schedule: {
+          select: {
+            days: {
+              select: {
+                day: true,
+                startTime: true,
+                endTime: true,
+              },
+              orderBy: { day: "asc" },
+            },
+          },
+        },
+        appointments: {
+          select: { id: true },
+        },
+        ratings: {
+          select: {
+            id: true,
+            stars: true,
+            comment: true,
+            createdAt: true,
+            patient: {
+              select: {
+                user: {
+                  select: { name: true, image: true },
+                },
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    });
+
+    if (!doctor) return { doctor: null, error: "Doctor not found" };
+    return { doctor, error: null };
+  } catch (error) {
+    console.error("Error fetching doctor:", error);
+    return { doctor: null, error: "Failed to load doctor profile" };
+  }
+}
+
+export async function getDoctorBySlug(slug: string) {
+  try {
+    const doctor = await prisma.doctor.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        slug: true,
         specialization: true,
         department: true,
         status: true,

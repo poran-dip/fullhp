@@ -3,7 +3,7 @@ import type { Session } from "next-auth";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-type Role = "Patient" | "Doctor" | "Driver" | "Admin";
+type Role = "Patient" | "Doctor" | "Admin";
 
 export async function requireAuth(requiredRoles?: Role[]) {
   const session = await auth();
