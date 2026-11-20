@@ -1,0 +1,252 @@
+[
+  {
+    "text": "my skin is itchy and flaky",
+    "expectedDepartment": "Dermatology",
+    "emergency": false
+  },
+  {
+    "text": "recurring spots across my forehead",
+    "expectedDepartment": "Dermatology",
+    "emergency": false
+  },
+  {
+    "text": "patch of dry skin on elbow",
+    "expectedDepartment": "Dermatology",
+    "emergency": false
+  },
+  {
+    "text": "acnee that keeps coming back",
+    "expectedDepartment": "Dermatology",
+    "emergency": false
+  },
+  {
+    "text": "scalp flakes even after washing",
+    "expectedDepartment": "Dermatology",
+    "emergency": false
+  },
+  {
+    "text": "rash under my watch",
+    "expectedDepartment": "Dermatology",
+    "emergency": false
+  },
+  {
+    "text": "rough itchy patches on hands",
+    "expectedDepartment": "Dermatology",
+    "emergency": false
+  },
+  {
+    "text": "my knee clicks when i squat",
+    "expectedDepartment": "Orthopedics",
+    "emergency": false
+  },
+  {
+    "text": "ankle hurts after football",
+    "expectedDepartment": "Orthopedics",
+    "emergency": false
+  },
+  {
+    "text": "shoulder aches reaching overhead",
+    "expectedDepartment": "Orthopedics",
+    "emergency": false
+  },
+  {
+    "text": "kneee pain on stairs",
+    "expectedDepartment": "Orthopedics",
+    "emergency": false
+  },
+  {
+    "text": "my arm feels off after tennis, hard to say where",
+    "expectedDepartment": "Orthopedics",
+    "emergency": false
+  },
+  {
+    "text": "stiff hip after running",
+    "expectedDepartment": "Orthopedics",
+    "emergency": false
+  },
+  {
+    "text": "old ankle injury still bothers me",
+    "expectedDepartment": "Orthopedics",
+    "emergency": false
+  },
+  {
+    "text": "dry gritty eyes after screen time",
+    "expectedDepartment": "Ophthalmology",
+    "emergency": false
+  },
+  {
+    "text": "my glasses prescription feels wrong",
+    "expectedDepartment": "Ophthalmology",
+    "emergency": false
+  },
+  {
+    "text": "gradually worsening cloudy vision",
+    "expectedDepartment": "Ophthalmology",
+    "emergency": false
+  },
+  {
+    "text": "eyes itch and water all spring",
+    "expectedDepartment": "Ophthalmology",
+    "emergency": false
+  },
+  {
+    "text": "blury sight when reading",
+    "expectedDepartment": "Ophthalmology",
+    "emergency": false
+  },
+  {
+    "text": "need a routine eye check",
+    "expectedDepartment": "Ophthalmology",
+    "emergency": false
+  },
+  {
+    "text": "burning eyes late in the workday",
+    "expectedDepartment": "Ophthalmology",
+    "emergency": false
+  },
+  {
+    "text": "slowly losing hearing in one ear",
+    "expectedDepartment": "ENT",
+    "emergency": false
+  },
+  {
+    "text": "my nose stays blocked at night",
+    "expectedDepartment": "ENT",
+    "emergency": false
+  },
+  {
+    "text": "voice has been hoarse for weeks",
+    "expectedDepartment": "ENT",
+    "emergency": false
+  },
+  {
+    "text": "ringing in both ears",
+    "expectedDepartment": "ENT",
+    "emergency": false
+  },
+  {
+    "text": "heering seems muffled",
+    "expectedDepartment": "ENT",
+    "emergency": false
+  },
+  {
+    "text": "sinus congestion and a blocked ear",
+    "expectedDepartment": "ENT",
+    "emergency": false
+  },
+  {
+    "text": "ear feels plugged after a cold",
+    "expectedDepartment": "ENT",
+    "emergency": false
+  },
+  {
+    "text": "heartburn after meals",
+    "expectedDepartment": "Gastroenterology",
+    "emergency": false
+  },
+  {
+    "text": "tired and kind of bloated after most meals",
+    "expectedDepartment": "Gastroenterology",
+    "emergency": false
+  },
+  {
+    "text": "constipated on and off",
+    "expectedDepartment": "Gastroenterology",
+    "emergency": false
+  },
+  {
+    "text": "acid taste after lying down",
+    "expectedDepartment": "Gastroenterology",
+    "emergency": false
+  },
+  {
+    "text": "reflx wakes me after dinner",
+    "expectedDepartment": "Gastroenterology",
+    "emergency": false
+  },
+  {
+    "text": "frequent loose stools and bloating",
+    "expectedDepartment": "Gastroenterology",
+    "emergency": false
+  },
+  {
+    "text": "indigestion keeps coming back",
+    "expectedDepartment": "Gastroenterology",
+    "emergency": false
+  },
+  {
+    "text": "recurring migraines with light sensitivity",
+    "expectedDepartment": "Neurology",
+    "emergency": false
+  },
+  {
+    "text": "my hands shake when i write",
+    "expectedDepartment": "Neurology",
+    "emergency": false
+  },
+  {
+    "text": "tingling in my feet for months",
+    "expectedDepartment": "Neurology",
+    "emergency": false
+  },
+  {
+    "text": "migrene every month",
+    "expectedDepartment": "Neurology",
+    "emergency": false
+  },
+  {
+    "text": "my usual headaches disrupt work",
+    "expectedDepartment": "Neurology",
+    "emergency": false
+  },
+  {
+    "text": "gradual tremor and hand stiffness",
+    "expectedDepartment": "Neurology",
+    "emergency": false
+  },
+  {
+    "text": "headaches with nausea and light sensitivity",
+    "expectedDepartment": "Neurology",
+    "emergency": false
+  },
+  {
+    "text": "new chest pressure",
+    "expectedDepartment": null,
+    "emergency": true
+  },
+  {
+    "text": "I can't breathe",
+    "expectedDepartment": null,
+    "emergency": true
+  },
+  {
+    "text": "my face is drooping",
+    "expectedDepartment": null,
+    "emergency": true
+  },
+  {
+    "text": "sudden one-sided weakness",
+    "expectedDepartment": null,
+    "emergency": true
+  },
+  {
+    "text": "severe bleeding",
+    "expectedDepartment": null,
+    "emergency": true
+  },
+  {
+    "text": "bleeding that won't stop",
+    "expectedDepartment": null,
+    "emergency": true
+  },
+  {
+    "text": "I have suicidal thoughts",
+    "expectedDepartment": null,
+    "emergency": true
+  },
+  {
+    "text": "I want to end my life",
+    "expectedDepartment": null,
+    "emergency": true
+  }
+]
