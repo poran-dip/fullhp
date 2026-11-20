@@ -2,6 +2,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 import { genAI } from "@/lib/gemini";
+import { emergencyMessage, isEmergency } from "@/lib/medbot/emergency";
 import { resolveMatch } from "@/lib/medbot/match";
 import { getActiveDoctors } from "@/services/medbot";
 
@@ -33,6 +34,18 @@ RESPONSE FORMAT:
 
 export async function POST(req: Request) {
   try {
+    const { symptoms } = await req.json();
+
+    if (!symptoms || typeof symptoms !== "string" || !symptoms.trim()) {
+      return NextResponse.json(
+        { error: "Symptoms are required." },
+        { status: 400 },
+      );
+    }
+
+    if (isEmergency(symptoms))
+      return NextResponse.json({ kind: "urgent", message: emergencyMessage });
+
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
 
@@ -41,15 +54,6 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
         { status: 429 },
-      );
-    }
-
-    const { symptoms } = await req.json();
-
-    if (!symptoms || typeof symptoms !== "string" || !symptoms.trim()) {
-      return NextResponse.json(
-        { error: "Symptoms are required." },
-        { status: 400 },
       );
     }
 

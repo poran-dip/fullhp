@@ -55,6 +55,7 @@ export default function MedbotPage() {
 
   const [symptoms, setSymptoms] = useState("");
   const [result, setResult] = useState<MedbotResult | null>(null);
+  const [urgent, setUrgent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -68,6 +69,7 @@ export default function MedbotPage() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setUrgent(null);
 
     try {
       const res = await apiFetch("/api/medbot", {
@@ -91,7 +93,8 @@ export default function MedbotPage() {
         return;
       }
 
-      setResult(data);
+      if (data.kind === "urgent") setUrgent(data.message);
+      else setResult(data);
     } catch {
       setError("We had issues processing that, try again later.");
     } finally {
@@ -111,7 +114,7 @@ export default function MedbotPage() {
       {/* Main content */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
         <div className="w-full max-w-2xl">
-          {!result && !loading && !error && (
+          {!urgent && !result && !loading && !error && (
             <div className="text-center space-y-3 mb-8">
               <div className="h-16 w-16 rounded-2xl bg-black flex items-center justify-center mx-auto">
                 <Stethoscope className="h-8 w-8 text-white" />
@@ -124,6 +127,12 @@ export default function MedbotPage() {
                 department and doctor for you.
               </p>
             </div>
+          )}
+
+          {urgent && (
+            <p role="alert" className="rounded-xl bg-red-50 p-5 text-red-800">
+              {urgent}
+            </p>
           )}
 
           {/* Error state */}
@@ -222,8 +231,9 @@ export default function MedbotPage() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            MedBot provides general guidance only. Always consult a healthcare
-            professional for medical advice.
+            MedBot helps you find a doctor. It does not provide medical advice
+            or diagnose symptoms. In an emergency, call your local emergency
+            number.
           </p>
         </div>
       </div>
