@@ -1,9 +1,8 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
-import { genAI } from "@/lib/gemini";
 import { emergencyMessage, isEmergency } from "@/lib/medbot/emergency";
-import { resolveMatch } from "@/lib/medbot/match";
+import { recommend } from "@/lib/medbot/recommend";
 import { getActiveDoctors } from "@/services/medbot";
 
 const ratelimit = new Ratelimit({
@@ -11,26 +10,6 @@ const ratelimit = new Ratelimit({
   limiter: Ratelimit.slidingWindow(10, "1 h"),
   analytics: true,
 });
-
-const SYSTEM_PROMPT = (doctorList: string) => `
-You are a medical triage assistant. Based on the patient's symptoms, recommend the most appropriate doctor from the list below.
-
-AVAILABLE DOCTORS:
-${doctorList}
-
-INSTRUCTIONS:
-- Analyze the symptoms carefully
-- Pick the single most appropriate doctor from the list above
-- Return ONLY valid JSON, no explanation, no markdown, no extra text
-- Do not compare with or reference other doctors by name or specialty
-- The reason should be warm and reassuring, e.g. "Dr. X is an excellent choice for your symptoms" — not clinical or comparative language like "most appropriate" or "best suited"
-
-RESPONSE FORMAT:
-{
-  "doctorSlug": "string",
-  "reason": "string"
-}
-`;
 
 export async function POST(req: Request) {
   try {
@@ -66,32 +45,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const doctorList = doctors
-      .map(
-        (d) =>
-          `- Name: ${d.user.name} | Slug: ${d.slug} | Department: ${d.department} | Specialization: ${d.specialization} | Rating: ${d.avgRating ?? "unrated"}`,
-      )
-      .join("\n");
-
-    const response = await genAI.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: `Patient symptoms: ${symptoms}` }],
-        },
-      ],
-      config: {
-        systemInstruction: SYSTEM_PROMPT(doctorList),
-        temperature: 0.3,
-      },
-    });
-
-    const raw = response.text?.trim() ?? "";
-    const cleaned = raw.replace(/```json|```/g, "").trim();
-    const result = JSON.parse(cleaned);
-
-    return NextResponse.json(resolveMatch(result, doctors));
+    const { match } = await recommend(symptoms, doctors);
+    return NextResponse.json(match);
   } catch (error) {
     console.error("MedBot error:", error);
 
