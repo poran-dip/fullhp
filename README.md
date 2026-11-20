@@ -89,7 +89,7 @@ PostgreSQL stores normalized 768-dimensional embeddings. Exact dot-product searc
 
 ### Evaluation
 
-Run `pnpm exec tsx --env-file=.env eval/run.ts` with a Gemini API key. The 50 synthetic cases include 42 routine department labels and eight emergency cases. Each mode uses the same active roster. The retrieval benchmark computes the same exact similarity in memory. Its latency includes the query embedding and generation, and excludes database/network access to PostgreSQL. Set `EVAL_ROSTER_COPIES=10` to stress prompt growth with repeated profiles. Use production-like data for deployment latency.
+Run `pnpm exec tsx --env-file=.env eval/run.ts` with a Gemini API key. The 50 synthetic cases include 42 routine department labels and eight emergency cases. Each mode uses the same active roster. The retrieval benchmark computes the same exact similarity in memory. Its latency includes the query embedding and generation, and excludes database/network access to PostgreSQL. The runner generates 100 active synthetic doctors by default from the department and specialization catalog in `eval/roster.ts`. Set `EVAL_ROSTER_SIZE=18` to reproduce the historical roster or choose a larger positive integer for a scale test. Larger cohorts reuse clinical focuses with unique doctor IDs. The legacy copies setting selects a size of 18 times the multiplier when no explicit size is set. Use production-like data for deployment latency.
 
 One run with 18 active fixture doctors used Gemini embeddings and Groq’s `openai/gpt-oss-120b` for ranking. Hits count routine queries where the expected department appeared at the indicated rank or better. Errors remain in the 42-query denominator. Prompt tokens are means over successful calls. Latency includes retry waits.
 

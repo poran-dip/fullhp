@@ -1,20 +1,35 @@
+import { setTimeout as sleep } from "node:timers/promises";
 import { embed, profileText } from "../src/lib/medbot/embedding";
 import { isEmergency } from "../src/lib/medbot/emergency";
 import { candidateScore } from "../src/lib/medbot/ranking";
 import { recommend } from "../src/lib/medbot/recommend";
 import cases from "./cases.json";
-import { isRateLimit, withRateLimitRetry } from "./rate-limit";
-import roster from "./roster.json";
+import {
+  isConnectTimeout,
+  isRateLimit,
+  withRateLimitRetry,
+} from "./rate-limit";
+import { buildEvalRoster } from "./roster";
 
 async function main() {
-  const copies = Number(process.env.EVAL_ROSTER_COPIES ?? 1);
-  if (!Number.isSafeInteger(copies) || copies < 1)
+  const gap = Number(
+    process.env.EVAL_INTERVAL_MS ??
+      (process.env.MEDBOT_PROVIDER === "groq" ? 9000 : 0),
+  );
+  if (!Number.isSafeInteger(gap) || gap < 0)
+    throw new Error("Expected nonnegative EVAL_INTERVAL_MS");
+  let nextStart = 0;
+  const size = process.env.EVAL_ROSTER_SIZE;
+  const copies = process.env.EVAL_ROSTER_COPIES;
+  if (
+    !size &&
+    copies !== undefined &&
+    (!Number.isSafeInteger(Number(copies)) || Number(copies) < 1)
+  )
     throw new Error("Expected positive EVAL_ROSTER_COPIES");
-  const active = Array.from({ length: copies }, (_, i) =>
-    roster
-      .filter((d) => d.status === "Active")
-      .map((d) => ({ ...d, slug: i ? d.slug + "-" + i : d.slug })),
-  ).flat();
+  const active = buildEvalRoster(
+    Number(size ?? (copies === undefined ? 100 : 18 * Number(copies))),
+  ).filter((d) => d.status === "Active");
   const cache = new Map<string, number[]>();
   for (const doctor of active) {
     const text = profileText(doctor);
@@ -23,7 +38,10 @@ async function main() {
   }
   const rows = [];
   const routine = cases.filter((c) => !c.emergency).length;
-  for (const mode of ["single", "directory-3", "retrieval-3"]) {
+  const modes = ["single", "directory-3", "retrieval-3"];
+  const total = routine * modes.length;
+  let current = 0;
+  for (const mode of modes) {
     let hits1 = 0,
       hits3 = 0,
       emergencies = 0,
@@ -33,12 +51,17 @@ async function main() {
       recalled = 0;
     const times: number[] = [];
     for (const c of cases) {
+      if (!c.emergency) {
+        current++;
+        console.log(`${current}/${total} ${mode} | ${c.text}`);
+      }
       const urgent = isEmergency(c.text);
       if (urgent || c.emergency) {
         if (urgent && c.emergency) emergencies++;
         else console.error(mode, "triage mismatch", c.text);
         continue;
       }
+      await sleep(Math.max(0, nextStart - Date.now()));
       const start = performance.now();
       try {
         let doctors = active;
@@ -76,10 +99,11 @@ async function main() {
         tokens += result.tokens;
         calls++;
       } catch (error) {
-        if (isRateLimit(error)) throw error;
+        if (isRateLimit(error) || isConnectTimeout(error)) throw error;
         errors++;
         console.error(mode, c.text, error);
       }
+      nextStart = Date.now() + gap;
       times.push(performance.now() - start);
     }
     times.sort((a, b) => a - b);
