@@ -134,6 +134,7 @@ model Doctor {
   userId         String        @unique @map("user_id")
   user           User          @relation(fields: [userId], references: [id])
   slug           String        @unique
+  medbotEmbedding Unsupported("double precision[]")? @map("medbot_embedding")
   phoneNo        String        @unique @map("phone_no")
   specialization String
   department     String
