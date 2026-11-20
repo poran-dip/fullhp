@@ -1,4 +1,5 @@
 import { genAI } from "../gemini";
+import { recommendWithGroq } from "./groq";
 import { type Candidate, resolveMatch } from "./match";
 
 import { resolveShortlist } from "./ranking";
@@ -28,6 +29,8 @@ export async function recommend(
   doctors: Candidate[],
   shortlist = false,
 ) {
+  if (process.env.MEDBOT_PROVIDER === "groq")
+    return recommendWithGroq(symptoms, doctors, shortlist);
   const doctorList = doctors
     .map(
       (d) =>
@@ -36,7 +39,7 @@ export async function recommend(
     .join("\n");
 
   const response = await genAI.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: process.env.MEDBOT_MODEL?.trim() || "gemini-3.8-flash",
     contents: [
       {
         role: "user",

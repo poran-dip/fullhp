@@ -14,7 +14,7 @@ export async function embed(
     config: { taskType, outputDimensionality: 768 },
   });
   const values = response.embeddings?.[0]?.values;
-  if (!values || values.length !== 768 || !values.every(Number.isFinite))
+  if (values?.length !== 768 || !values.every(Number.isFinite))
     throw new Error("Invalid embedding");
   const norm = Math.hypot(...values);
   if (!norm) throw new Error("Empty embedding");
