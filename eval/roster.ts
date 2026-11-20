@@ -75,7 +75,7 @@ export function buildEvalRoster(size = 100) {
     // Later cohorts share a primary specialty and rotate a secondary focus.
     const offset = round % areas.length;
     const focus = offset
-      ? specialization + " and " + areas[(index + offset) % areas.length]
+      ? `${specialization} and ${areas[(index + offset) % areas.length]}`
       : specialization;
     const ratings = [
       { avgRating: null, ratingCount: 0 },
@@ -88,12 +88,14 @@ export function buildEvalRoster(size = 100) {
       department,
       specialization: focus,
       status: "Active",
-      ...ratings[number % 3]!,
+      ...(ratings[number % ratings.length] ?? ratings[0]),
     };
   });
+  const [first, second] = active;
+  if (!first) throw new Error("Expected at least one active doctor");
   return [
     ...active,
-    { ...active[0]!, slug: "inactive", status: "Inactive" },
-    { ...(active[1] ?? active[0])!, slug: "on-leave", status: "OnLeave" },
+    { ...first, slug: "inactive", status: "Inactive" },
+    { ...(second ?? first), slug: "on-leave", status: "OnLeave" },
   ];
 }
