@@ -2,6 +2,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 import { genAI } from "@/lib/gemini";
+import { resolveMatch } from "@/lib/medbot/match";
 import { getActiveDoctors } from "@/services/medbot";
 
 const ratelimit = new Ratelimit({
@@ -25,9 +26,7 @@ INSTRUCTIONS:
 
 RESPONSE FORMAT:
 {
-  "department": "string",
   "doctorSlug": "string",
-  "doctorName": "string",
   "reason": "string"
 }
 `;
@@ -66,7 +65,7 @@ export async function POST(req: Request) {
     const doctorList = doctors
       .map(
         (d) =>
-          `- ID: ${d.id} | Name: ${d.user.name} | Slug: ${d.slug} | Department: ${d.department} | Specialization: ${d.specialization} | Rating: ${d.avgRating ?? "unrated"}`,
+          `- Name: ${d.user.name} | Slug: ${d.slug} | Department: ${d.department} | Specialization: ${d.specialization} | Rating: ${d.avgRating ?? "unrated"}`,
       )
       .join("\n");
 
@@ -88,24 +87,7 @@ export async function POST(req: Request) {
     const cleaned = raw.replace(/```json|```/g, "").trim();
     const result = JSON.parse(cleaned);
 
-    if (
-      !result.department ||
-      !result.doctorId ||
-      !result.doctorName ||
-      !result.reason
-    ) {
-      throw new Error("Incomplete response from model");
-    }
-
-    const matched = doctors.find((d) => d.id === result.doctorId);
-
-    return NextResponse.json({
-      department: result.department,
-      doctorId: result.doctorId,
-      doctorName: result.doctorName,
-      reason: result.reason,
-      avgRating: matched?.avgRating ?? null,
-    });
+    return NextResponse.json(resolveMatch(result, doctors));
   } catch (error) {
     console.error("MedBot error:", error);
 
