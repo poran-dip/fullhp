@@ -91,11 +91,15 @@ PostgreSQL stores normalized 768-dimensional embeddings. Exact dot-product searc
 
 Run `pnpm exec tsx --env-file=.env eval/run.ts` with a Gemini API key. The 50 synthetic cases include 42 routine department labels and eight emergency cases. Each mode uses the same active roster. The retrieval benchmark computes the same exact similarity in memory. Its latency includes the query embedding and generation, and excludes database/network access to PostgreSQL. Set `EVAL_ROSTER_COPIES=10` to stress prompt growth with repeated profiles. Use production-like data for deployment latency.
 
-| Mode | Hit@1 | Hit@3 | Prompt tokens | p95 latency |
-| --- | --- | --- | --- | --- |
-| Full directory, one | Pending live evaluation | N/A | Pending | Pending |
-| Full directory, three | Pending | Pending | Pending | Pending |
-| Retrieval, three | Pending | Pending | Pending | Pending |
+One run with 18 active fixture doctors used Gemini embeddings and Groq’s `openai/gpt-oss-120b` for ranking. Hits count routine queries where the expected department appeared at the indicated rank or better. Errors remain in the 42-query denominator. Prompt tokens are means over successful calls. Latency includes retry waits.
+
+| Mode | Hit@1 | Hit@3 | Errors | Mean prompt tokens | p50 | p95 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Full directory, one | 42/42 | N/A | 0 | 650.0 | 1.97 s | 6.30 s |
+| Full directory, three | 41/42 | 41/42 | 1 | 688.9 | 5.15 s | 10.05 s |
+| Retrieval, three | 40/42 | 40/42 | 2 | 490.0 | 6.32 s | 8.37 s |
+
+For each query, the baseline sent all 18 active doctor profiles to the ranker. Retrieval sent the 10 closest profiles instead. Both modes requested up to three recommendations. Across successful calls, the smaller candidate list reduced the mean ranking prompt from 688.9 to 490.0 tokens (**28.9%**). The retrieved candidates included the expected department for **42/42** routine queries. All 40 completed retrieval-mode rankings placed that department first.
 
 Offline fixture check: the emergency pre-check routed all eight urgent cases and left all 42 routine cases eligible for matching. These synthetic examples do not establish clinical sensitivity.
 
