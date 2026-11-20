@@ -3,6 +3,7 @@ import { isEmergency } from "../src/lib/medbot/emergency";
 import { candidateScore } from "../src/lib/medbot/ranking";
 import { recommend } from "../src/lib/medbot/recommend";
 import cases from "./cases.json";
+import { isRateLimit, withRateLimitRetry } from "./rate-limit";
 import roster from "./roster.json";
 
 async function main() {
@@ -64,7 +65,9 @@ async function main() {
           if (doctors.some((d) => d.department === c.expectedDepartment))
             recalled++;
         }
-        const result = await recommend(c.text, doctors, mode !== "single");
+        const result = await withRateLimitRetry(() =>
+          recommend(c.text, doctors, mode !== "single"),
+        );
         const departments = result.matches.map((m) => m.department);
         if (departments[0] === c.expectedDepartment) hits1++;
         else console.error(mode, "top-1 miss", c.text, departments);
@@ -73,6 +76,7 @@ async function main() {
         tokens += result.tokens;
         calls++;
       } catch (error) {
+        if (isRateLimit(error)) throw error;
         errors++;
         console.error(mode, c.text, error);
       }

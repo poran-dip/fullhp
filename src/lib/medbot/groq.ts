@@ -60,11 +60,18 @@ export async function recommendWithGroq(
       signal: AbortSignal.timeout(60000),
     },
   );
-  if (!response.ok)
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null);
     throw Object.assign(
-      new Error(`Groq ranking request failed (HTTP ${response.status})`),
-      { status: response.status },
+      new Error(
+        `Groq ranking request failed (HTTP ${response.status}): ${detail?.error?.message ?? response.statusText}`,
+      ),
+      {
+        status: response.status,
+        retryAfter: response.headers.get("retry-after"),
+      },
     );
+  }
   const data = await response.json();
   const result = JSON.parse(data.choices?.[0]?.message?.content ?? "");
   return {
