@@ -2,8 +2,10 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 import { emergencyMessage, isEmergency } from "@/lib/medbot/emergency";
+import { candidateScore } from "@/lib/medbot/ranking";
 import { recommend } from "@/lib/medbot/recommend";
 import { getActiveDoctors } from "@/services/medbot";
+import { retrieveDoctors } from "@/services/medbot-retrieval";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
@@ -36,17 +38,22 @@ export async function POST(req: Request) {
       );
     }
 
-    const { doctors, error: dbError } = await getActiveDoctors();
+    const shortlist = process.env.MEDBOT_MODE === "retrieval";
+    const doctors = shortlist
+      ? (await retrieveDoctors(symptoms)).sort(
+          (a, b) => candidateScore(b) - candidateScore(a),
+        )
+      : (await getActiveDoctors()).doctors;
 
-    if (dbError || doctors.length === 0) {
+    if (doctors.length === 0) {
       return NextResponse.json(
         { error: "No doctors available at this time." },
         { status: 503 },
       );
     }
 
-    const { match } = await recommend(symptoms, doctors);
-    return NextResponse.json(match);
+    const { matches } = await recommend(symptoms, doctors, shortlist);
+    return NextResponse.json({ kind: "matches", matches });
   } catch (error) {
     console.error("MedBot error:", error);
 

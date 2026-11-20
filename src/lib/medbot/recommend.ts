@@ -1,6 +1,8 @@
 import { genAI } from "../gemini";
 import { type Candidate, resolveMatch } from "./match";
 
+import { resolveShortlist } from "./ranking";
+
 const SYSTEM_PROMPT = (doctorList: string) => `
 You are a medical triage assistant. Based on the patient's symptoms, recommend the most appropriate doctor from the list below.
 
@@ -21,7 +23,11 @@ RESPONSE FORMAT:
 }
 `;
 
-export async function recommend(symptoms: string, doctors: Candidate[]) {
+export async function recommend(
+  symptoms: string,
+  doctors: Candidate[],
+  shortlist = false,
+) {
   const doctorList = doctors
     .map(
       (d) =>
@@ -38,7 +44,10 @@ export async function recommend(symptoms: string, doctors: Candidate[]) {
       },
     ],
     config: {
-      systemInstruction: SYSTEM_PROMPT(doctorList),
+      systemInstruction: shortlist
+        ? `Match symptoms to up to three suitable doctors in best-first order. Candidate order is a weak prior. Give one brief reason about specialty fit per choice. Do not diagnose or promise an outcome. Return a JSON array of {doctorSlug, reason} objects. Choose unique slugs only from these records:\n${doctorList}`
+        : SYSTEM_PROMPT(doctorList),
+      responseMimeType: "application/json",
       temperature: 0.3,
     },
   });
@@ -48,7 +57,9 @@ export async function recommend(symptoms: string, doctors: Candidate[]) {
   const result = JSON.parse(cleaned);
 
   return {
-    match: resolveMatch(result, doctors),
+    matches: shortlist
+      ? resolveShortlist(result, doctors)
+      : [resolveMatch(result, doctors)],
     tokens: response.usageMetadata?.promptTokenCount ?? 0,
   };
 }
