@@ -100,3 +100,5 @@ Run `pnpm exec tsx --env-file=.env eval/run.ts` with a Gemini API key. The 50 sy
 Offline fixture check: the emergency pre-check routed all eight urgent cases and left all 42 routine cases eligible for matching. These synthetic examples do not establish clinical sensitivity.
 
 The runner also reports retrieval recall, emergency recall, failures and median latency. Keep the baseline as default until measured results justify promotion. Run offline regression tests with `pnpm exec tsx --test tests/*.test.mjs`.
+
+Signed-in matching requests share a quota of ten per hour per account. Guests get five per hour per trusted Vercel address. On other hosts, unidentified guests share one fallback bucket. Emergency guidance bypasses these quotas.
