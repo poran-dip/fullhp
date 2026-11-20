@@ -54,7 +54,7 @@ export default function MedbotPage() {
   const { apiFetch } = useApi();
 
   const [symptoms, setSymptoms] = useState("");
-  const [result, setResult] = useState<MedbotResult | null>(null);
+  const [results, setResults] = useState<MedbotResult[]>([]);
   const [urgent, setUrgent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +68,7 @@ export default function MedbotPage() {
     if (!symptoms.trim() || loading) return;
     setLoading(true);
     setError(null);
-    setResult(null);
+    setResults([]);
     setUrgent(null);
 
     try {
@@ -94,7 +94,7 @@ export default function MedbotPage() {
       }
 
       if (data.kind === "urgent") setUrgent(data.message);
-      else setResult(data);
+      else setResults(data.matches);
     } catch {
       setError("We had issues processing that, try again later.");
     } finally {
@@ -112,9 +112,9 @@ export default function MedbotPage() {
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] bg-gray-50">
       {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <div className="min-h-0 overflow-y-auto flex-1 flex flex-col items-center px-4 py-8">
         <div className="w-full max-w-2xl">
-          {!urgent && !result && !loading && !error && (
+          {!urgent && results.length === 0 && !loading && !error && (
             <div className="text-center space-y-3 mb-8">
               <div className="h-16 w-16 rounded-2xl bg-black flex items-center justify-center mx-auto">
                 <Stethoscope className="h-8 w-8 text-white" />
@@ -151,11 +151,14 @@ export default function MedbotPage() {
           )}
 
           {/* Result card */}
-          {result && (
-            <div className="mb-6 rounded-xl border bg-white shadow-sm overflow-hidden">
+          {results.map((result, index) => (
+            <div
+              key={result.doctorSlug}
+              className="mb-6 rounded-xl border bg-white shadow-sm overflow-hidden"
+            >
               <div className="bg-black px-5 py-4">
                 <p className="text-xs text-gray-400 uppercase tracking-widest font-medium">
-                  Recommendation
+                  Recommendation {index + 1}
                 </p>
               </div>
               <div className="px-5 py-5 space-y-4">
@@ -192,7 +195,7 @@ export default function MedbotPage() {
                   {result.reason}
                 </p>
                 <Link
-                  href={`/patient/book?doctor=${result.doctorSlug}&department=${encodeURIComponent(result.department)}`}
+                  href={`/patient/book?doctor=${encodeURIComponent(result.doctorSlug)}`}
                 >
                   <Button className="w-full bg-black text-white hover:bg-gray-800 mt-1">
                     <CalendarPlus className="h-4 w-4 mr-2" />
@@ -201,7 +204,7 @@ export default function MedbotPage() {
                 </Link>
               </div>
             </div>
-          )}
+          ))}
         </div>
       </div>
 
