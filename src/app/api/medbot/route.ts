@@ -1,16 +1,26 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { emergencyMessage, isEmergency } from "@/lib/medbot/emergency";
+import { limiterIdentity } from "@/lib/medbot/identity";
 import { candidateScore } from "@/lib/medbot/ranking";
 import { recommend } from "@/lib/medbot/recommend";
 import { getActiveDoctors } from "@/services/medbot";
 import { retrieveDoctors } from "@/services/medbot-retrieval";
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
+const redis = Redis.fromEnv();
+const signedInLimit = new Ratelimit({
+  redis,
+  prefix: "medbot:account",
   limiter: Ratelimit.slidingWindow(10, "1 h"),
   analytics: true,
+});
+
+const guestLimit = new Ratelimit({
+  redis,
+  prefix: "medbot:guest",
+  limiter: Ratelimit.slidingWindow(5, "1 h"),
 });
 
 export async function POST(req: Request) {
@@ -27,10 +37,14 @@ export async function POST(req: Request) {
     if (isEmergency(symptoms))
       return NextResponse.json({ kind: "urgent", message: emergencyMessage });
 
-    const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
-
-    const { success } = await ratelimit.limit(ip);
+    const session = await auth();
+    const identity = limiterIdentity(
+      session?.user?.id,
+      req.headers,
+      process.env.VERCEL === "1",
+    );
+    const limiter = identity.signedIn ? signedInLimit : guestLimit;
+    const { success } = await limiter.limit(identity.key);
     if (!success) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
