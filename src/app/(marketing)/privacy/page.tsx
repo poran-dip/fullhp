@@ -26,6 +26,14 @@ export default function PrivacyPolicy() {
             you ("you" or "User") provide when using our platform ("the
             Platform").
           </p>
+          <p>
+            FullHP is currently a demo. Please do not enter real personal or
+            medical information. See our{" "}
+            <Link href="/terms" className="text-blue-600 hover:underline">
+              Terms of Service
+            </Link>
+            .
+          </p>
 
           <hr className="my-8" />
 

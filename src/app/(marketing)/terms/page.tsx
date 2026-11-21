@@ -47,7 +47,23 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-base font-bold text-slate-800">
-              2. Platform Availability and Limitation of Liability
+              2. Demonstration Use
+            </h2>
+            <p>
+              FullHP is currently a demonstration platform and is not affiliated
+              with any real hospital or healthcare provider. The doctors and
+              reviews shown are mock data created for demonstration purposes
+              only, and any booking made is simulated. FullHP, its developers,
+              and affiliates shall not be held liable for any bookings made or
+              any reliance placed on this data.
+            </p>
+          </section>
+
+          <hr className="my-8" />
+
+          <section>
+            <h2 className="text-base font-bold text-slate-800">
+              3. Platform Availability and Limitation of Liability
             </h2>
             <p>
               The Platform is provided on an "as is" and "as available" basis,
@@ -69,7 +85,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-base font-bold text-slate-800">
-              3. User-Generated Content
+              4. User-Generated Content
             </h2>
             <p>
               All information, text, or other content submitted by you to the
@@ -100,7 +116,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-base font-bold text-slate-800">
-              4. Prohibited Conduct
+              5. Prohibited Conduct
             </h2>
             <p>
               You agree not to engage in any of the following prohibited
@@ -132,7 +148,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-base font-bold text-slate-800">
-              5. Data Collection and Privacy
+              6. Data Collection and Privacy
             </h2>
             <p>
               We collect only the data necessary to operate and secure the
@@ -155,7 +171,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-base font-bold text-slate-800">
-              6. Termination
+              7. Termination
             </h2>
             <p>
               We reserve the right to suspend or terminate your access to the
@@ -169,7 +185,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-base font-bold text-slate-800">
-              7. Governing Law
+              8. Governing Law
             </h2>
             <p>
               These Terms shall be governed by and construed in accordance with
@@ -185,7 +201,7 @@ export default function TermsOfService() {
 
           <section>
             <h2 className="text-base font-bold text-slate-800">
-              8. Contact Information
+              9. Contact Information
             </h2>
             <p>
               For any inquiries regarding these Terms, you may contact us at:{" "}
